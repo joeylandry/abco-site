@@ -36,11 +36,33 @@ type CurrentLocation = {
   longitude: number
 }
 
+type MapProvider = "apple" | "google"
+
 const ZIP_CODE_PATTERN = /^\d{5}$/
 const MOBILE_LOCATION_BATCH_SIZE = 5
 const MOBILE_MAP_TILE_ZOOM = 15
 const MOBILE_STORE_MARKER_LOGO_SRC = "/main_logo_no_text.png"
 const MOBILE_STORE_MARKER_GLOW = "rgba(52, 201, 121, 0.18)"
+
+function isApplePlatform() {
+  if (typeof navigator === "undefined") {
+    return false
+  }
+
+  const navigatorWithUserAgentData = navigator as Navigator & {
+    userAgentData?: {
+      platform?: string
+    }
+  }
+
+  const platform =
+    typeof navigatorWithUserAgentData.userAgentData?.platform === "string" &&
+    navigatorWithUserAgentData.userAgentData.platform
+      ? navigatorWithUserAgentData.userAgentData.platform
+      : navigator.platform
+
+  return /Mac|iPhone|iPad|iPod/.test(platform)
+}
 
 const beerFinderCoverFilterOptions: BeerFilterOption[] = mockBeers
   .map((beer) => {
@@ -216,6 +238,25 @@ function formatMobileAddress(address: string | null) {
   }
 
   return address.replace(/,\s*United States of America$/i, ", MA")
+}
+
+function buildMapSearchQuery(location: BeerFinderLocation) {
+  return location.address ?? `${location.name}, Massachusetts`
+}
+
+function buildMobileMapsUrl(location: BeerFinderLocation, mapProvider: MapProvider) {
+  const query = encodeURIComponent(buildMapSearchQuery(location))
+
+  if (mapProvider === "apple") {
+    const coordinates =
+      location.latitude !== null && location.longitude !== null
+        ? `&ll=${encodeURIComponent(`${location.latitude},${location.longitude}`)}`
+        : ""
+
+    return `https://maps.apple.com/?q=${query}${coordinates}`
+  }
+
+  return `https://www.google.com/maps/search/?api=1&query=${query}`
 }
 
 function isLocationCoordinateSet(location: BeerFinderLocation): location is BeerFinderLocation & CurrentLocation {
@@ -420,6 +461,7 @@ function MobileBeerFinderLocationCard({
   matchingBeers,
   currentLocation,
   leafletReady,
+  mapProvider,
 }: {
   location: BeerFinderLocation
   distanceLabel: string | null
@@ -427,8 +469,11 @@ function MobileBeerFinderLocationCard({
   matchingBeers: string[]
   currentLocation: CurrentLocation | null
   leafletReady: boolean
+  mapProvider: MapProvider
 }) {
   const displayAddress = formatMobileAddress(location.address)
+  const mapsUrl = buildMobileMapsUrl(location, mapProvider)
+  const mapsLabel = mapProvider === "apple" ? "Open in Apple Maps" : "Open in Google Maps"
 
   return (
     <article className="overflow-hidden rounded-[24px] border border-black/10 bg-white/88 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
@@ -460,7 +505,11 @@ function MobileBeerFinderLocationCard({
           )}
         </div>
 
-        <div className="relative flex min-h-[8.75rem] w-full overflow-hidden rounded-[18px] border border-black/10 bg-[#dce4ec] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.26)]">
+        <a
+          href={mapsUrl}
+          aria-label={`${mapsLabel} for ${location.name}`}
+          className="group relative flex min-h-[8.75rem] w-full cursor-pointer overflow-hidden rounded-[18px] border border-black/10 bg-[#dce4ec] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.26)] transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+        >
           {hasCoordinates(location) ? (
             <div className="absolute inset-0">
               <Image
@@ -471,10 +520,9 @@ function MobileBeerFinderLocationCard({
                 sizes="(max-width: 640px) 25vw, 112px"
               />
             </div>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/[0.03] text-[10px] font-semibold uppercase tracking-[0.16em] text-black/50">
-              Map unavailable
-            </div>
+          ) : null}
+          {hasCoordinates(location) ? null : (
+            <div className="absolute inset-0 bg-black/[0.03]" />
           )}
           {leafletReady && hasCoordinates(location) ? (
             <MobileBeerFinderMiniMap
@@ -489,7 +537,7 @@ function MobileBeerFinderLocationCard({
               <MapPinIcon />
             </div>
           ) : null}
-        </div>
+        </a>
       </div>
     </article>
   )
@@ -514,6 +562,7 @@ function MobileBeerFinder({
   const [isLocatingCurrentLocation, setIsLocatingCurrentLocation] = useState(false)
   const [currentLocationError, setCurrentLocationError] = useState<string | null>(null)
   const [leafletReady, setLeafletReady] = useState(false)
+  const [preferredMapProvider, setPreferredMapProvider] = useState<MapProvider>("google")
   const [visibleLocationCount, setVisibleLocationCount] = useState(MOBILE_LOCATION_BATCH_SIZE)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDrawerRendered, setIsDrawerRendered] = useState(false)
@@ -530,6 +579,10 @@ function MobileBeerFinder({
   } | null>(null)
   const filterMenuRef = useRef<HTMLDivElement | null>(null)
   const filterButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    setPreferredMapProvider(isApplePlatform() ? "apple" : "google")
+  }, [])
 
   const trimmedZipCode = zipCode.trim()
   const isValidZipCode = isCompleteZipCode(trimmedZipCode)
@@ -1077,6 +1130,7 @@ function MobileBeerFinder({
                           matchingBeers={matchingBeers}
                           currentLocation={currentLocation}
                           leafletReady={leafletReady}
+                          mapProvider={preferredMapProvider}
                         />
                       )
                     })}

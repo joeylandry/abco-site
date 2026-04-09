@@ -215,6 +215,7 @@ export default function MobileEventsPage() {
                 event={event}
                 label={index === 0 ? "Next Event" : "Upcoming Event"}
                 accentIndex={index}
+                interactive
               />
             ))}
           </div>

@@ -1,9 +1,12 @@
 "use client"
 
 import Button from "@/components/ui/Button"
+import { useRouter } from "next/navigation"
 import type { EventItem } from "@/app/events/mockEvents"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
+import { scrollToTopInstantly } from "@/lib/scrollToTop"
 import { MobileEventBadge, MobileEventDateStack } from "@/components/events/mobile/MobileEventShared"
+import type { KeyboardEvent, MouseEvent } from "react"
 
 const EVENT_CARD_BACKDROP =
   "radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 34%), radial-gradient(circle at bottom right, rgba(255,255,255,0.08), transparent 32%), linear-gradient(135deg, rgba(255,255,255,0.12), transparent 30%, rgba(0,0,0,0.06))"
@@ -12,6 +15,7 @@ export function MobileEventWidget({
   event,
   label,
   accentIndex,
+  interactive = false,
   ctaLabel = "Learn more",
   ctaHref = event.href,
   secondaryCtaLabel,
@@ -20,18 +24,42 @@ export function MobileEventWidget({
   event: EventItem
   label: string
   accentIndex: number
+  interactive?: boolean
   ctaLabel?: string
   ctaHref?: string
   secondaryCtaLabel?: string
   secondaryCtaHref?: string
 }) {
+  const router = useRouter()
   const theme = getEventCardTheme(accentIndex)
   const hasSecondaryCta = Boolean(secondaryCtaLabel && secondaryCtaHref)
   const secondaryButtonHref = secondaryCtaHref ?? ctaHref
+  const navigateToEvent = () => {
+    scrollToTopInstantly()
+    router.push(event.href)
+  }
+
+  const handleCardKeyDown = (keyboardEvent: KeyboardEvent<HTMLElement>) => {
+    if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+      keyboardEvent.preventDefault()
+      navigateToEvent()
+    }
+  }
+
+  const stopCardNavigation = (mouseEvent: MouseEvent<HTMLElement>) => {
+    mouseEvent.stopPropagation()
+  }
 
   return (
     <article
-      className="relative isolate mx-auto aspect-square w-full max-w-[20.5rem] overflow-hidden border shadow-[0_24px_60px_-36px_rgba(0,0,0,0.5)]"
+      className={`relative isolate mx-auto aspect-square w-full max-w-[20.5rem] overflow-hidden border shadow-[0_24px_60px_-36px_rgba(0,0,0,0.5)] ${
+        interactive ? "cursor-pointer transition-transform duration-200 hover:-translate-y-1" : ""
+      }`}
+      role={interactive ? "link" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onClick={interactive ? navigateToEvent : undefined}
+      onKeyDown={interactive ? handleCardKeyDown : undefined}
+      aria-label={interactive ? `View details for ${event.title}` : undefined}
       style={{
         backgroundColor: theme.accentColor,
         borderColor: theme.railBorderColor,
@@ -83,6 +111,7 @@ export function MobileEventWidget({
             <div className="grid grid-cols-2 gap-2">
               <Button
                 href={secondaryButtonHref}
+                onClick={stopCardNavigation}
                 className="w-full whitespace-nowrap border border-white/30 !bg-white/12 !px-3 !py-[0.6rem] text-[0.66rem] uppercase tracking-[0.14em] !text-current !shadow-none backdrop-blur-md supports-[backdrop-filter]:!bg-white/12 hover:!bg-white/22 hover:!text-current hover:!opacity-100 hover:!translate-y-0 sm:!px-4 sm:text-[0.76rem]"
               >
                 {secondaryCtaLabel}
@@ -90,6 +119,7 @@ export function MobileEventWidget({
 
               <Button
                 href={ctaHref}
+                onClick={stopCardNavigation}
                 className="w-full whitespace-nowrap border border-white/30 !bg-white/16 !px-3 !py-[0.6rem] text-[0.66rem] uppercase tracking-[0.14em] !text-current !shadow-none backdrop-blur-md supports-[backdrop-filter]:!bg-white/16 hover:!bg-white/24 hover:!text-current hover:!opacity-100 hover:!translate-y-0 sm:!px-4 sm:text-[0.76rem]"
               >
                 {ctaLabel}
@@ -98,6 +128,7 @@ export function MobileEventWidget({
           ) : (
             <Button
               href={ctaHref}
+              onClick={stopCardNavigation}
               className="w-full whitespace-nowrap border border-white/30 !bg-white/16 !px-4 !py-[0.6rem] text-[0.68rem] uppercase tracking-[0.14em] !text-current !shadow-none backdrop-blur-md supports-[backdrop-filter]:!bg-white/16 hover:!bg-white/24 hover:!text-current hover:!opacity-100 hover:!translate-y-0 sm:!px-[1.375rem] sm:!py-3 sm:text-[0.8rem]"
             >
               {ctaLabel}
@@ -122,11 +153,33 @@ export function MobileCalendarGridCard({
   description?: string
   expandDescription?: boolean
 }) {
+  const router = useRouter()
   const theme = getEventCardTheme(accentIndex)
+  const navigateToEvent = () => {
+    scrollToTopInstantly()
+    onNavigate?.()
+    router.push(event.href)
+  }
+
+  const handleCardKeyDown = (keyboardEvent: KeyboardEvent<HTMLElement>) => {
+    if (keyboardEvent.key === "Enter" || keyboardEvent.key === " ") {
+      keyboardEvent.preventDefault()
+      navigateToEvent()
+    }
+  }
+
+  const stopCardNavigation = (mouseEvent: MouseEvent<HTMLElement>) => {
+    mouseEvent.stopPropagation()
+  }
 
   return (
     <article
-      className="group relative block aspect-[4/5] w-full overflow-hidden border shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
+      className="group relative block aspect-[4/5] w-full cursor-pointer overflow-hidden border shadow-[0_16px_36px_rgba(0,0,0,0.12)]"
+      role="link"
+      tabIndex={0}
+      onClick={navigateToEvent}
+      onKeyDown={handleCardKeyDown}
+      aria-label={`View details for ${event.title}`}
       style={{
         backgroundColor: theme.accentColor,
         borderColor: theme.railBorderColor,
@@ -176,7 +229,7 @@ export function MobileCalendarGridCard({
           <Button
             href={event.href}
             onClick={(clickEvent) => {
-              clickEvent.stopPropagation()
+              stopCardNavigation(clickEvent)
               onNavigate?.()
             }}
             className="w-full border border-white/30 !bg-white/16 !px-3 !py-2.5 text-[0.68rem] uppercase tracking-[0.16em] !text-current !shadow-none backdrop-blur-md supports-[backdrop-filter]:!bg-white/16 hover:!bg-white/24 hover:!text-current hover:!opacity-100 hover:!translate-y-0"

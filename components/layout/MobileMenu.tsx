@@ -387,7 +387,7 @@ export default function MobileMenu() {
                   isDrawerOpen || drawerDragProgress !== null ? "opacity-100" : "opacity-0"
                 }`}
                 style={{ opacity: drawerBackdropOpacity }}
-                onClick={closeMenu}
+                onClick={() => closeMenu()}
               />
 
               <div
@@ -423,7 +423,7 @@ export default function MobileMenu() {
                     type="button"
                     className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center text-neutral-800 transition hover:text-neutral-950"
                     aria-label="Close navigation menu"
-                    onClick={closeMenu}
+                    onClick={() => closeMenu()}
                   >
                     <svg
                       aria-hidden="true"

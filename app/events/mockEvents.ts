@@ -9,6 +9,8 @@ export type EventItem = {
   eventType: string
   time: string
   location: string
+  calendarStart?: string
+  calendarEnd?: string
   status: "upcoming" | "past"
   ageRestriction: "21+" | "All ages"
   href: string
@@ -42,6 +44,8 @@ export const upcomingEvents: EventItem[] = [
     imageSrc: "/events/jazz_fest.jpg",
     detailImages: buildEventDetailImages("/events/jazz_fest.jpg"),
     inHouseEvent: false,
+    calendarStart: "2026-04-10T16:30:00-04:00",
+    calendarEnd: "2026-04-10T22:00:00-04:00",
   },
   {
     id: "april-11-melrose-beer-bites",
@@ -63,6 +67,8 @@ export const upcomingEvents: EventItem[] = [
     imageSrc: "/events/melrose_bb.jpg",
     detailImages: buildEventDetailImages("/events/melrose_bb.jpg"),
     inHouseEvent: false,
+    calendarStart: "2026-04-11T18:00:00-04:00",
+    calendarEnd: "2026-04-11T21:30:00-04:00",
   },
   {
     id: "april-11-studio-aca",
@@ -84,6 +90,8 @@ export const upcomingEvents: EventItem[] = [
     imageSrc: "/events/studio.jpg",
     detailImages: buildEventDetailImages("/events/studio.jpg"),
     inHouseEvent: false,
+    calendarStart: "2026-04-11T19:00:00-04:00",
+    calendarEnd: "2026-04-11T22:00:00-04:00",
   },
   {
     id: "april-17-mill-cafe-after-hours",
@@ -103,6 +111,8 @@ export const upcomingEvents: EventItem[] = [
     href: "/events/april-17-mill-cafe-after-hours",
     detailImages: buildEventDetailImages(),
     inHouseEvent: false,
+    calendarStart: "2026-04-17T16:30:00-04:00",
+    calendarEnd: "2026-04-17T22:00:00-04:00",
   },
   {
     id: "april-18-menotomy-beer-hall",
@@ -122,6 +132,8 @@ export const upcomingEvents: EventItem[] = [
     href: "/events/april-18-menotomy-beer-hall",
     detailImages: buildEventDetailImages(),
     inHouseEvent: false,
+    calendarStart: "2026-04-18T12:00:00-04:00",
+    calendarEnd: "2026-04-18T18:00:00-04:00",
   },
   {
     id: "april-18-ma-craft-brewers-festival",
@@ -144,6 +156,8 @@ export const upcomingEvents: EventItem[] = [
     imageSrc: "/events/brew_fest.jpeg",
     detailImages: buildEventDetailImages("/events/brew_fest.jpeg"),
     inHouseEvent: false,
+    calendarStart: "2026-04-18T13:00:00-04:00",
+    calendarEnd: "2026-04-18T20:00:00-04:00",
   },
   {
     id: "may-15-copley-square-farmers-market",
@@ -163,6 +177,8 @@ export const upcomingEvents: EventItem[] = [
     href: "/events/may-15-copley-square-farmers-market",
     detailImages: buildEventDetailImages(),
     inHouseEvent: false,
+    calendarStart: "2026-05-15T11:00:00-04:00",
+    calendarEnd: "2026-05-15T18:00:00-04:00",
   },
 ]
 

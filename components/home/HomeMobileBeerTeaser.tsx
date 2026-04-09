@@ -4,6 +4,10 @@ import MobileBeerCard from "@/components/beer/MobileBeerCard"
 
 const teaserBeers = mockBeers.slice(0, 6)
 
+type HomeMobileBeerTeaserProps = {
+  variant?: "home" | "related"
+}
+
 function ArrowIcon() {
   return (
     <svg
@@ -17,7 +21,7 @@ function ArrowIcon() {
   )
 }
 
-export default function HomeMobileBeerTeaser() {
+export default function HomeMobileBeerTeaser({ variant = "home" }: HomeMobileBeerTeaserProps) {
   if (teaserBeers.length === 0) {
     return null
   }
@@ -26,14 +30,24 @@ export default function HomeMobileBeerTeaser() {
     <section className="bg-background py-6 md:hidden">
       <div className="w-full">
         <div className="mb-4 px-3">
-          <div className="flex flex-col gap-3">
-            <h2 className="font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
-              OUR
+          {variant === "home" ? (
+            <div className="flex flex-col gap-3">
+              <h2 className="font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
+                OUR
+              </h2>
+              <h2 className="font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
+                BEERS
+              </h2>
+            </div>
+          ) : (
+            <h2 className="max-w-[72%] font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
+              <span className="flex flex-col gap-5">
+                <span className="block whitespace-nowrap">YOU MAY</span>
+                <span className="block">ALSO</span>
+                <span className="block">LIKE...</span>
+              </span>
             </h2>
-            <h2 className="font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
-              BEERS
-            </h2>
-          </div>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-0">

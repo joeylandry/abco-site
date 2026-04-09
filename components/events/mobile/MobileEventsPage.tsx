@@ -245,7 +245,7 @@ export default function MobileEventsPage() {
                 className={`absolute inset-0 bg-black/35 transition-opacity duration-200 ${
                   isDrawerOpen ? "opacity-100" : "opacity-0"
                 }`}
-                onClick={closeDrawer}
+                onClick={() => closeDrawer()}
               />
 
               <div
@@ -262,7 +262,7 @@ export default function MobileEventsPage() {
                   <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={closeDrawer}
+                      onClick={() => closeDrawer()}
                       aria-label="Close all events"
                       className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/90 text-black shadow-[0_12px_28px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:bg-white"
                     >

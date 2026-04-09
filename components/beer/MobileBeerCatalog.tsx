@@ -282,6 +282,9 @@ export default function MobileBeerCatalog() {
                     <h2 className="mt-1 font-heading text-3xl leading-none text-black">
                       Beer Menu
                     </h2>
+                    <p className="mt-2 max-w-[18rem] text-xs leading-relaxed text-neutral-500">
+                      Viewer note: this filter menu is functional, but the visual design is still a placeholder.
+                    </p>
                   </div>
 
                   <button

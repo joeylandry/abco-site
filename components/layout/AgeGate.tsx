@@ -130,14 +130,24 @@ export default function AgeGate() {
         onClick={(event) => event.stopPropagation()}
       >
         <div className="hidden min-h-[320px] md:flex">
-          <div className="flex w-[42%] items-center justify-center border-r border-black/10 p-10">
+          <div className="relative flex w-[42%] items-center justify-center overflow-hidden border-r border-black/10">
+            <Image
+              src="/tom_gate.jpg"
+              alt="ABCo age gate background"
+              fill
+              priority
+              sizes="42vw"
+              className="object-cover brightness-110 contrast-105"
+            />
+            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/15" />
             <Image
               src="/main_logo_full.png"
               alt="ABCo"
               width={520}
               height={220}
               priority
-              className="h-auto w-full max-w-[360px]"
+              className="relative z-10 h-auto w-full max-w-[360px] invert"
             />
           </div>
 
@@ -178,48 +188,62 @@ export default function AgeGate() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center px-5 py-8 md:hidden">
-          <div className="flex w-full max-w-md flex-col items-center text-center">
+        <div className="flex flex-col md:hidden">
+          <div className="relative flex h-[220px] w-full items-center justify-center overflow-hidden">
+            <Image
+              src="/tom_gate.jpg"
+              alt="ABCo age gate background"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center brightness-110 contrast-105"
+            />
+            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/15" />
             <Image
               src="/main_logo_full.png"
               alt="ABCo"
               width={420}
               height={180}
               priority
-              className="h-auto w-[260px] sm:w-[290px]"
+              className="relative z-10 h-auto w-[260px] invert sm:w-[290px]"
             />
+          </div>
 
-            <h2 className="mt-6 text-3xl font-semibold tracking-tight text-black sm:text-4xl">
-              Are you 21+?
-            </h2>
+          <div className="flex flex-col items-center justify-center px-5 py-8">
+            <div className="flex w-full max-w-md flex-col items-center text-center">
+              <h2 className="text-3xl font-semibold tracking-tight text-black sm:text-4xl">
+                Are you 21+?
+              </h2>
 
-            <div className="mt-8 flex w-full gap-3">
-              <Button
-                type="button"
-                onClick={handleDecline}
-                className="flex-1 border border-black bg-white !px-4 !py-3 !text-base !leading-none !tracking-normal text-black shadow-none hover:bg-black hover:text-white hover:!translate-y-0"
-              >
-                No
-              </Button>
-              <Button
-                id="abco-age-gate-confirm-mobile"
-                type="button"
-                onClick={handleConfirm}
-                className="flex-1 bg-black !px-4 !py-3 !text-base !leading-none !tracking-normal text-white shadow-none hover:opacity-95 hover:!translate-y-0"
-              >
-                Yes
-              </Button>
+              <div className="mt-8 flex w-full gap-3">
+                <Button
+                  type="button"
+                  onClick={handleDecline}
+                  className="flex-1 border border-black bg-white !px-4 !py-3 !text-base !leading-none !tracking-normal text-black shadow-none hover:bg-black hover:text-white hover:!translate-y-0"
+                >
+                  No
+                </Button>
+                <Button
+                  id="abco-age-gate-confirm-mobile"
+                  type="button"
+                  onClick={handleConfirm}
+                  className="flex-1 bg-black !px-4 !py-3 !text-base !leading-none !tracking-normal text-white shadow-none hover:opacity-95 hover:!translate-y-0"
+                >
+                  Yes
+                </Button>
+              </div>
+
+              <label className="mt-4 flex select-none items-center justify-center gap-2 text-sm text-black/70">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                  className="h-4 w-4 rounded border-black/40 text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                />
+                Remember me
+              </label>
             </div>
-
-            <label className="mt-4 flex select-none items-center justify-center gap-2 text-sm text-black/70">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
-                className="h-4 w-4 rounded border-black/40 text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-              />
-              Remember me
-            </label>
           </div>
         </div>
       </div>

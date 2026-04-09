@@ -15,7 +15,6 @@ type BeerFinderPageProps = {
   searchParams: Promise<{
     beer?: string | string[]
     zip?: string
-    near?: string
   }>
 }
 
@@ -78,10 +77,9 @@ function resolveBeerFilters(rawBeer: string | string[] | undefined) {
 }
 
 export default async function BeerFinderPage({ searchParams }: BeerFinderPageProps) {
-  const { beer, zip, near } = await searchParams
+  const { beer, zip } = await searchParams
   const initialSelectedBeers = resolveBeerFilters(beer)
   const initialZip = zip && isCompleteZipCode(zip) ? zip.trim() : null
-  const initialUseCurrentLocation = Boolean(near && ["1", "true"].includes(near.trim().toLowerCase()))
   const data = await getBeerFinderData()
 
   return (
@@ -112,11 +110,10 @@ export default async function BeerFinderPage({ searchParams }: BeerFinderPagePro
           <>
             <div className="md:hidden">
               <MobileBeerFinder
-                key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${initialUseCurrentLocation ? "near" : "zip"}-${data.generatedAt}-${data.locations.length}`}
+                key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${data.generatedAt}-${data.locations.length}`}
                 locations={data.locations}
                 initialSelectedBeers={initialSelectedBeers}
                 initialZip={initialZip}
-                initialUseCurrentLocation={initialUseCurrentLocation}
               />
             </div>
 

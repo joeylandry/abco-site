@@ -26,7 +26,7 @@ function MobileAnnouncementCard({
           alt={imageAlt ?? headline}
           fill
           sizes="(max-width: 767px) 100vw, 0px"
-          className="object-cover object-[54%_46%] brightness-[0.78] contrast-105"
+          className="origin-center object-cover object-[54%_58%] brightness-[0.78] contrast-105"
         />
 
         <div className="absolute inset-0 bg-gradient-to-b from-black/66 via-black/1 to-black/0" />

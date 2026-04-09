@@ -34,7 +34,7 @@ export default function HomeMobileBeerFinder() {
 
   function handleNearMe() {
     scrollToTopInstantly()
-    router.push("/beer-finder?near=1")
+    router.push("/beer-finder")
   }
 
   return (

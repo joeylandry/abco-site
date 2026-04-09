@@ -21,7 +21,6 @@ type MobileBeerFinderProps = {
   locations: BeerFinderLocation[]
   initialSelectedBeers: string[]
   initialZip: string | null
-  initialUseCurrentLocation?: boolean
 }
 
 type BeerFilterOption = {
@@ -279,12 +278,6 @@ function buildMiniMapCurrentLocationIcon(leaflet: LeafletRuntime) {
   })
 }
 
-function buildDirectionsUrl(location: BeerFinderLocation) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    location.address ?? `${location.name}, Massachusetts`
-  )}`
-}
-
 function MapPinIcon() {
   return (
     <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-[0_0_0_7px_rgba(52,201,121,0.18),0_10px_18px_rgba(15,23,42,0.18)]">
@@ -435,7 +428,6 @@ function MobileBeerFinderLocationCard({
   currentLocation: CurrentLocation | null
   leafletReady: boolean
 }) {
-  const directionsUrl = buildDirectionsUrl(location)
   const displayAddress = formatMobileAddress(location.address)
 
   return (
@@ -468,13 +460,7 @@ function MobileBeerFinderLocationCard({
           )}
         </div>
 
-        <a
-          href={directionsUrl}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`Open directions to ${location.name}`}
-          className="relative flex min-h-[8.75rem] w-full overflow-hidden rounded-[18px] border border-black/10 bg-[#dce4ec] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.26)]"
-        >
+        <div className="relative flex min-h-[8.75rem] w-full overflow-hidden rounded-[18px] border border-black/10 bg-[#dce4ec] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.26)]">
           {hasCoordinates(location) ? (
             <div className="absolute inset-0">
               <Image
@@ -503,10 +489,7 @@ function MobileBeerFinderLocationCard({
               <MapPinIcon />
             </div>
           ) : null}
-          <span className="absolute inset-x-2 bottom-2 rounded-full bg-black/72 px-2 py-1 text-center text-[9px] font-semibold uppercase tracking-[0.18em] text-white">
-            Tap for directions
-          </span>
-        </a>
+        </div>
       </div>
     </article>
   )
@@ -516,7 +499,6 @@ function MobileBeerFinder({
   locations,
   initialSelectedBeers,
   initialZip,
-  initialUseCurrentLocation = false,
 }: MobileBeerFinderProps) {
   const router = useRouter()
   const [zipCode, setZipCode] = useState(() => initialZip ?? "")
@@ -548,7 +530,6 @@ function MobileBeerFinder({
   } | null>(null)
   const filterMenuRef = useRef<HTMLDivElement | null>(null)
   const filterButtonRef = useRef<HTMLButtonElement | null>(null)
-  const hasAutoUsedCurrentLocationRef = useRef(false)
 
   const trimmedZipCode = zipCode.trim()
   const isValidZipCode = isCompleteZipCode(trimmedZipCode)
@@ -571,11 +552,11 @@ function MobileBeerFinder({
   }, [beerFilterSearch])
 
   const canClearAllFilters = hasActiveFilters || Boolean(beerFilterSearch.trim())
-  const activeSearchLocation = zipSearchCoordinates ?? currentLocation
-  const activeSearchLocationLabel = zipSearchCoordinates
-    ? `ZIP code ${initialZip?.trim() ?? ""}`
-    : currentLocation
-      ? "your current location"
+  const activeSearchLocation = currentLocation ?? zipSearchCoordinates
+  const activeSearchLocationLabel = currentLocation
+    ? "your current location"
+    : zipSearchCoordinates
+      ? `ZIP code ${initialZip?.trim() ?? ""}`
       : null
 
   const filteredLocations = useMemo(() => {
@@ -675,19 +656,7 @@ function MobileBeerFinder({
     }
   }, [initialZip])
 
-  useEffect(() => {
-    if (
-      !initialUseCurrentLocation ||
-      initialZip ||
-      hasAutoUsedCurrentLocationRef.current ||
-      currentLocation ||
-      isLocatingCurrentLocation
-    ) {
-      return
-    }
-
-    hasAutoUsedCurrentLocationRef.current = true
-
+  const handleUseCurrentLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setCurrentLocationError("Current location is not available in this browser.")
       return
@@ -695,6 +664,7 @@ function MobileBeerFinder({
 
     setIsLocatingCurrentLocation(true)
     setCurrentLocationError(null)
+    setCurrentLocation(null)
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -706,6 +676,7 @@ function MobileBeerFinder({
         } else {
           setCurrentLocationError("Unable to retrieve your current location.")
         }
+
         setIsLocatingCurrentLocation(false)
       },
       (error) => {
@@ -722,7 +693,7 @@ function MobileBeerFinder({
         maximumAge: 300000,
       }
     )
-  }, [currentLocation, initialUseCurrentLocation, initialZip, isLocatingCurrentLocation])
+  }, [])
 
   const clearAllFilters = () => {
     setSelectedBeerFilters([])
@@ -916,18 +887,6 @@ function MobileBeerFinder({
     router.push(`/beer-finder?${params.toString()}`)
   }
 
-  function handleNearMe() {
-    const params = new URLSearchParams()
-    params.set("near", "1")
-
-    for (const beerName of selectedBeerFilters) {
-      params.append("beer", beerName)
-    }
-
-    scrollToTopInstantly()
-    router.push(`/beer-finder?${params.toString()}`)
-  }
-
   return (
     <>
       <Script
@@ -1025,7 +984,7 @@ function MobileBeerFinder({
 
               <button
                 type="button"
-                onClick={handleNearMe}
+                onClick={handleUseCurrentLocation}
                 aria-label="Use current location"
                 className="inline-flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-full border border-black/10 bg-black px-3.5 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_10px_24px_rgba(0,0,0,0.08)] transition hover:bg-black/90 hover:border-black/20"
               >
@@ -1219,6 +1178,26 @@ function MobileBeerFinder({
                         Clear all
                       </button>
                     </form>
+
+                    <div className="flex items-start gap-2 rounded-2xl border border-amber-300/70 bg-amber-50 px-3 py-2 text-[11px] leading-5 text-amber-950">
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className="mt-0.5 h-4 w-4 shrink-0 text-amber-700"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 9v4" />
+                        <path d="M12 16.5h.01" />
+                        <path d="M10.29 4.86 2.81 18a2 2 0 0 0 1.73 3h15a2 2 0 0 0 1.73-3L13.71 4.86a2 2 0 0 0-3.42 0Z" />
+                      </svg>
+                      <p>
+                        Search is whack right now.
+                      </p>
+                    </div>
                   </div>
 
                   <div className="grid gap-3">

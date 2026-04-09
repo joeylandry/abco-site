@@ -235,7 +235,7 @@ export default async function HomeFeaturedBeers() {
         <div className="mt-8 flex gap-6 overflow-x-auto pb-4">
           {featuredBeers.map((beer) => (
             <div key={beer.id} className="min-w-[280px] max-w-[280px] flex-none">
-              <BeerCard beer={beer} interactive={false} />
+              <BeerCard beer={beer} />
             </div>
           ))}
         </div>

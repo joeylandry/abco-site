@@ -18,7 +18,7 @@ export default function HomeMobileNextEvent() {
           secondaryCtaLabel="View all events"
           secondaryCtaHref="/events"
           ctaLabel="Learn more"
-          ctaHref="/visit"
+          ctaHref={nextEvent.href}
         />
       </div>
     </section>

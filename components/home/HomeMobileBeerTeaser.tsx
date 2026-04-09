@@ -52,7 +52,7 @@ export default function HomeMobileBeerTeaser({ variant = "home" }: HomeMobileBee
 
         <div className="grid grid-cols-2 gap-0">
           {teaserBeers.map((beer) => (
-            <MobileBeerCard key={beer.id} beer={beer} interactive={variant !== "home"} />
+            <MobileBeerCard key={beer.id} beer={beer} interactive />
           ))}
         </div>
 

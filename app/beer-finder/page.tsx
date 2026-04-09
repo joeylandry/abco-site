@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import BeerFinderExplorer from "@/components/beer/BeerFinderExplorer"
+import MobileBeerFinder from "@/components/beer/MobileBeerFinder"
 import { mockBeers } from "@/app/beer/mockBeers"
 import { getBeerFinderData } from "@/lib/breww"
 
@@ -14,6 +15,7 @@ type BeerFinderPageProps = {
   searchParams: Promise<{
     beer?: string | string[]
     zip?: string
+    near?: string
   }>
 }
 
@@ -76,9 +78,10 @@ function resolveBeerFilters(rawBeer: string | string[] | undefined) {
 }
 
 export default async function BeerFinderPage({ searchParams }: BeerFinderPageProps) {
-  const { beer, zip } = await searchParams
+  const { beer, zip, near } = await searchParams
   const initialSelectedBeers = resolveBeerFilters(beer)
   const initialZip = zip && isCompleteZipCode(zip) ? zip.trim() : null
+  const initialUseCurrentLocation = Boolean(near && ["1", "true"].includes(near.trim().toLowerCase()))
   const data = await getBeerFinderData()
 
   return (
@@ -107,14 +110,26 @@ export default async function BeerFinderPage({ searchParams }: BeerFinderPagePro
           </section>
         ) : (
           <>
-            <BeerFinderExplorer
-              key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${data.generatedAt}-${data.locations.length}`}
-              locations={data.locations}
-              initialSelectedBeers={initialSelectedBeers}
-              initialZip={initialZip}
-            />
+            <div className="md:hidden">
+              <MobileBeerFinder
+                key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${initialUseCurrentLocation ? "near" : "zip"}-${data.generatedAt}-${data.locations.length}`}
+                locations={data.locations}
+                initialSelectedBeers={initialSelectedBeers}
+                initialZip={initialZip}
+                initialUseCurrentLocation={initialUseCurrentLocation}
+              />
+            </div>
 
-            <section className="px-6 pb-12 md:pb-16">
+            <div className="hidden md:block">
+              <BeerFinderExplorer
+                key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${data.generatedAt}-${data.locations.length}`}
+                locations={data.locations}
+                initialSelectedBeers={initialSelectedBeers}
+                initialZip={initialZip}
+              />
+            </div>
+
+            <section className="hidden px-6 pb-12 md:block md:pb-16">
               <div className="mx-auto max-w-7xl rounded-[24px] border border-black/10 bg-[#f4f0e8] px-6 py-5 shadow-sm sm:px-7 sm:py-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div>

@@ -92,7 +92,7 @@ export default function Footer() {
                 alt="Arlington Brewing Company Monogram"
                 width={70}
                 height={70}
-                className="opacity-90"
+                className="h-auto w-auto opacity-90"
               />
             </Link>
             <div className="space-y-1.5 text-sm leading-6 text-black/80">

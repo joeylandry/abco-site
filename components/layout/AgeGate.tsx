@@ -138,6 +138,7 @@ export default function AgeGate() {
               priority
               sizes="42vw"
               className="object-cover brightness-110 contrast-105"
+              style={{ objectPosition: "40% center" }}
             />
             <div className="absolute inset-0 bg-black/35" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/15" />
@@ -200,14 +201,18 @@ export default function AgeGate() {
             />
             <div className="absolute inset-0 bg-black/35" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/15" />
-            <Image
-              src="/main_logo_full.png"
-              alt="ABCo"
-              width={420}
-              height={180}
-              priority
-              className="relative z-10 h-auto w-[260px] invert sm:w-[290px]"
-            />
+            <div className="absolute inset-0 z-10 flex items-center justify-center px-5 py-6 sm:px-8">
+              <div className="relative h-full w-full max-w-[300px]">
+                <Image
+                  src="/main_logo_full.png"
+                  alt="ABCo"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 72vw, 300px"
+                  className="object-contain invert"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col items-center justify-center px-5 py-8">

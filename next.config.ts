@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    localPatterns: [
+      {
+        pathname: "/**",
+      },
+      {
+        pathname: "/api/map-tiles/**",
+      },
+    ],
     remotePatterns: [
       {
         protocol: "https",

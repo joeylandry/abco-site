@@ -214,6 +214,15 @@ function isCompleteZipCode(value: string) {
   return ZIP_CODE_PATTERN.test(value.trim())
 }
 
+function isFiniteCurrentLocation(value: CurrentLocation | null | undefined): value is CurrentLocation {
+  return (
+    value !== null &&
+    value !== undefined &&
+    Number.isFinite(value.latitude) &&
+    Number.isFinite(value.longitude)
+  )
+}
+
 function formatBeerCountLabel(count: number) {
   return `${count} beer${count === 1 ? "" : "s"}`
 }
@@ -392,7 +401,10 @@ function applyBeerFinderMapView(options: {
     ignoreNextMapMoveEndRef,
   } = options
 
-  if (prioritizedMapLocation) {
+  const hasFiniteCurrentLocation = isFiniteCurrentLocation(currentLocation)
+  const hasFinitePrioritizedLocation = isFiniteCurrentLocation(prioritizedMapLocation)
+
+  if (hasFinitePrioritizedLocation) {
     const mapViewRadiusMiles = resolveMinimumMapViewRadiusMiles({
       center: prioritizedMapLocation,
       visibleLocations,
@@ -427,7 +439,7 @@ function applyBeerFinderMapView(options: {
     return
   }
 
-  const fitBoundsPoints = currentLocation
+  const fitBoundsPoints = hasFiniteCurrentLocation
     ? [
         [currentLocation.latitude, currentLocation.longitude] as [number, number],
         ...visibleLocations.map((location) => [location.latitude, location.longitude] as [number, number]),
@@ -620,14 +632,16 @@ function BeerFinderExplorerInner({
           } | null
         }
 
+        const resolvedCoordinates = isFiniteCurrentLocation(payload.coordinates)
+          ? {
+              latitude: payload.coordinates.latitude,
+              longitude: payload.coordinates.longitude,
+            }
+          : null
+
         setSearchLocationMatch({
           query: trimmedSearch,
-          coordinates: payload.coordinates
-            ? {
-                latitude: payload.coordinates.latitude,
-                longitude: payload.coordinates.longitude,
-              }
-            : null,
+          coordinates: resolvedCoordinates,
         })
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
@@ -924,10 +938,14 @@ function BeerFinderExplorerInner({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setCurrentLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        })
+        if (Number.isFinite(position.coords.latitude) && Number.isFinite(position.coords.longitude)) {
+          setCurrentLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          })
+        } else {
+          setCurrentLocationError("Unable to retrieve your current location.")
+        }
         setIsLocatingCurrentLocation(false)
       },
       (error) => {
@@ -2025,10 +2043,26 @@ function BeerFinderExplorerInner({
 }
 
 export default function BeerFinderExplorer(props: BeerFinderExplorerProps) {
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false)
   const searchParams = useSearchParams()
   const deepLinkedBeerParams = searchParams.getAll("beer").map((value) => value.trim()).filter(Boolean)
   const deepLinkedZipParam = searchParams.get("zip")
   const deepLinkedNearParam = searchParams.get("near")
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)")
+
+    const updateViewportMatch = () => {
+      setIsDesktopViewport(mediaQuery.matches)
+    }
+
+    updateViewportMatch()
+    mediaQuery.addEventListener("change", updateViewportMatch)
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewportMatch)
+    }
+  }, [])
 
   const deepLinkedBeerNames = useMemo(() => {
     if (deepLinkedBeerParams.length === 0) {
@@ -2074,6 +2108,10 @@ export default function BeerFinderExplorer(props: BeerFinderExplorerProps) {
   const effectiveInitialSelectedBeers = deepLinkedBeerNames ?? props.initialSelectedBeers
   const effectiveInitialZip = deepLinkedZip ?? props.initialZip
   const remountKey = `${effectiveInitialZip ?? "nozip"}|${effectiveInitialSelectedBeers.join("\u0000") || "all"}`
+
+  if (!isDesktopViewport) {
+    return null
+  }
 
   return (
     <BeerFinderExplorerInner

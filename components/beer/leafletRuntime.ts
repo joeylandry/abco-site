@@ -127,5 +127,10 @@ export function getLeaflet() {
 }
 
 export function hasCoordinates<T extends NullableCoordinates>(value: T): value is WithCoordinates<T> {
-  return value.latitude !== null && value.longitude !== null
+  return (
+    value.latitude !== null &&
+    value.longitude !== null &&
+    Number.isFinite(value.latitude) &&
+    Number.isFinite(value.longitude)
+  )
 }

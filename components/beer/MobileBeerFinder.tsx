@@ -240,20 +240,21 @@ function formatMobileAddress(address: string | null) {
   return address.replace(/,\s*United States of America$/i, ", MA")
 }
 
-function buildMapSearchQuery(location: BeerFinderLocation) {
+function buildBusinessListingQuery(location: BeerFinderLocation) {
+  const businessName = location.name.trim()
+
+  if (businessName) {
+    return businessName
+  }
+
   return location.address ?? `${location.name}, Massachusetts`
 }
 
 function buildMobileMapsUrl(location: BeerFinderLocation, mapProvider: MapProvider) {
-  const query = encodeURIComponent(buildMapSearchQuery(location))
+  const query = encodeURIComponent(buildBusinessListingQuery(location))
 
   if (mapProvider === "apple") {
-    const coordinates =
-      location.latitude !== null && location.longitude !== null
-        ? `&ll=${encodeURIComponent(`${location.latitude},${location.longitude}`)}`
-        : ""
-
-    return `https://maps.apple.com/?q=${query}${coordinates}`
+    return `https://maps.apple.com/?q=${query}`
   }
 
   return `https://www.google.com/maps/search/?api=1&query=${query}`
@@ -473,7 +474,7 @@ function MobileBeerFinderLocationCard({
 }) {
   const displayAddress = formatMobileAddress(location.address)
   const mapsUrl = buildMobileMapsUrl(location, mapProvider)
-  const mapsLabel = mapProvider === "apple" ? "Open in Apple Maps" : "Open in Google Maps"
+  const mapsLabel = mapProvider === "apple" ? "Open business listing in Apple Maps" : "Open business listing in Google Maps"
 
   return (
     <article className="overflow-hidden rounded-[24px] border border-black/10 bg-white/88 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
@@ -1015,7 +1016,7 @@ function MobileBeerFinder({
                     setZipCode(event.target.value.replace(/\D+/g, "").slice(0, 5))
                   }}
                   placeholder="ZIP code"
-                  className="h-12 w-full border-b border-black/25 bg-transparent px-0 text-[0.92rem] font-semibold uppercase tracking-[0.16em] text-black outline-none transition placeholder:text-black/35 focus:border-black"
+                  className="h-12 w-full border-b border-black/25 bg-transparent px-0 text-base font-semibold uppercase tracking-[0.16em] text-black outline-none transition placeholder:text-black/35 focus:border-black"
                 />
               </label>
 

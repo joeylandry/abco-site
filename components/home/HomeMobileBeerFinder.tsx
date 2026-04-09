@@ -76,7 +76,7 @@ export default function HomeMobileBeerFinder() {
                   setZipCode(event.target.value.replace(/\D+/g, "").slice(0, 5))
                 }}
                 placeholder="ZIP code"
-                className="h-12 w-full border-b border-black/25 bg-transparent px-0 text-[0.92rem] font-semibold uppercase tracking-[0.16em] text-black outline-none transition placeholder:text-black/35 focus:border-black"
+                className="h-12 w-full border-b border-black/25 bg-transparent px-0 text-base font-semibold uppercase tracking-[0.16em] text-black outline-none transition placeholder:text-black/35 focus:border-black"
               />
             </label>
 

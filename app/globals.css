@@ -1,0 +1,375 @@
+@import "tailwindcss";
+
+/* =========================
+   DESIGN TOKENS (AB-006)
+   ========================= */
+
+html {
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+:root {
+  /* ----- BRAND COLORS ----- */
+  --color-bg: #FFFFFF;       /* digital background */
+  --color-surface: #FFFFFF; /* white */
+  --color-text: #161616;    /* Pantone Black C */
+  --color-brand: #74C3D5;   /* Pantone 630 C */
+
+  /* ----- ABCO PALETTE (from image) ----- */
+  --abco-coral: #FC7C55;     /* Pantone 2024 C */
+  --abco-orange: #FF9422;    /* Pantone 3588 C */
+  --abco-gold: #FFC658;      /* Pantone 135 C */
+  --abco-tan: #E2B77E;       /* Pantone 7508 C */
+
+  --abco-sage: #A9C27F;      /* Pantone 577 C */
+  --abco-green: #55A980;     /* Pantone 2249 C */
+  --abco-aqua: #79DBD4;      /* Pantone 7471 C */
+  --abco-blue: #74C3D5;      /* Pantone 630 C */
+
+  --abco-clay: #C68B67;      /* Pantone 7515 */
+  --abco-peach: #FFA489;     /* Pantone 1625 C */
+  --abco-olive: #D0C782;     /* Pantone 616 C */
+
+  --abco-pink: #F3A7DB;      /* Pantone 236 C */
+  --abco-lavender: #C2A0D9;  /* Pantone 2567 C */
+  --abco-mauve: #C4B7BC;     /* Pantone 2473 C */
+
+  /* ----- SPACING SCALE ----- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ----- RADII ----- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+}
+
+/* =========================
+   TAILWIND v4 THEME MAPPING
+   ========================= */
+
+@theme inline {
+  /* colors */
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-surface: var(--color-surface);
+  --color-brand: var(--color-brand);
+
+  /* ✅ ABCo palette → enables bg-abco-*, text-abco-*, border-abco-* */
+  --color-abco-coral: var(--abco-coral);
+  --color-abco-orange: var(--abco-orange);
+  --color-abco-gold: var(--abco-gold);
+  --color-abco-tan: var(--abco-tan);
+
+  --color-abco-sage: var(--abco-sage);
+  --color-abco-green: var(--abco-green);
+  --color-abco-aqua: var(--abco-aqua);
+  --color-abco-blue: var(--abco-blue);
+
+  --color-abco-clay: var(--abco-clay);
+  --color-abco-peach: var(--abco-peach);
+  --color-abco-olive: var(--abco-olive);
+
+  --color-abco-pink: var(--abco-pink);
+  --color-abco-lavender: var(--abco-lavender);
+  --color-abco-mauve: var(--abco-mauve);
+
+  /* font roles (mapped from next/font/local variables on <html>) */
+  --font-display-role: var(--font-display), system-ui, -apple-system, "Segoe UI",
+    Roboto, Arial, sans-serif;
+  --font-heading-role: var(--font-title), system-ui, -apple-system, "Segoe UI",
+    Roboto, Arial, sans-serif;
+  --font-ui-role: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+
+  /* Tailwind default sans font */
+  --font-sans: var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto,
+    Arial, sans-serif;
+
+  /* spacing */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+  --spacing-12: var(--space-12);
+  --spacing-16: var(--space-16);
+
+  /* radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+}
+
+/* =========================
+   BASE STYLES
+   ========================= */
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* Hide age-gate immediately for returning visitors (set before hydration). */
+html[data-abco-age-verified="true"] .abco-age-gate {
+  display: none;
+}
+
+/* baseline keyboard focus visibility */
+:where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+  border-radius: 0.25rem;
+}
+
+/* skip link: hidden until keyboard focus */
+.skip-link {
+  position: absolute;
+  top: -999px;
+  left: 1rem;
+  z-index: 1000;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.skip-link:focus-visible {
+  top: 1rem;
+}
+
+/* font utility classes you already use */
+@utility font-display {
+  font-family: var(--font-display-role);
+}
+@utility font-heading {
+  font-family: var(--font-heading-role);
+}
+@utility font-ui {
+  font-family: var(--font-ui-role);
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #d9d7d2;
+  font-family: var(--font-ui-role);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.leaflet-container img,
+.leaflet-container svg,
+.leaflet-container canvas {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.leaflet-tile {
+  filter: inherit;
+  visibility: inherit;
+}
+
+.leaflet-tile-loaded {
+  visibility: inherit;
+}
+
+.leaflet-zoom-animated {
+  -webkit-transform-origin: 0 0;
+  -ms-transform-origin: 0 0;
+  transform-origin: 0 0;
+}
+
+svg.leaflet-zoom-animated,
+.leaflet-tile-container {
+  will-change: transform;
+}
+
+.leaflet-safari .leaflet-tile-container {
+  width: 1600px;
+  height: 1600px;
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+  transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
+}
+
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+  transition: none;
+}
+
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.leaflet-container a {
+  color: inherit;
+}
+
+.leaflet-pane {
+  z-index: 400;
+}
+
+.leaflet-tile-pane {
+  z-index: 200;
+  filter: grayscale(1) contrast(0.92) brightness(1.03);
+}
+
+.leaflet-overlay-pane {
+  z-index: 400;
+}
+
+.leaflet-shadow-pane {
+  z-index: 500;
+}
+
+.leaflet-marker-pane {
+  z-index: 600;
+}
+
+.leaflet-tooltip-pane {
+  z-index: 650;
+}
+
+.leaflet-popup-pane {
+  z-index: 700;
+}
+
+.leaflet-control {
+  position: relative;
+  z-index: 800;
+  pointer-events: auto;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  position: absolute;
+  z-index: 900;
+  pointer-events: none;
+}
+
+.leaflet-top {
+  top: 0;
+}
+
+.leaflet-bottom {
+  bottom: 0;
+}
+
+.leaflet-right {
+  right: 0;
+}
+
+.leaflet-left {
+  left: 0;
+}
+
+.leaflet-control-zoom,
+.leaflet-control-attribution {
+  margin: 12px;
+}
+
+.beer-finder-map .leaflet-tile-pane {
+  filter: grayscale(1) contrast(1.08) brightness(1.02);
+}
+
+.beer-finder-map.leaflet-container {
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.leaflet-control-attribution,
+.leaflet-control-zoom a {
+  background: rgba(0, 0, 0, 0.88) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-control-zoom {
+  border: 0 !important;
+}
+
+.leaflet-control-zoom a {
+  display: block;
+  width: 42px !important;
+  height: 42px !important;
+  line-height: 42px !important;
+  text-align: center;
+  font-size: 24px !important;
+  text-decoration: none;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 18px;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.18);
+}
+
+.leaflet-popup-content {
+  margin: 14px 16px;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none;
+}
+
+.leaflet-tooltip.beer-finder-marker-tooltip {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+  padding: 0;
+}
+
+.leaflet-tooltip.beer-finder-marker-tooltip::before {
+  border-top-color: rgba(15, 23, 42, 0.96);
+}
+
+.leaflet-tooltip-top.beer-finder-marker-tooltip::before {
+  border-top-color: rgba(15, 23, 42, 0.96);
+}
+
+.leaflet-tooltip-bottom.beer-finder-marker-tooltip::before {
+  border-bottom-color: rgba(15, 23, 42, 0.96);
+}
+
+.leaflet-tooltip-left.beer-finder-marker-tooltip::before {
+  border-left-color: rgba(15, 23, 42, 0.96);
+}
+
+.leaflet-tooltip-right.beer-finder-marker-tooltip::before {
+  border-right-color: rgba(15, 23, 42, 0.96);
+}

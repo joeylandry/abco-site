@@ -323,8 +323,6 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                 key={relatedEvent.id}
                 event={relatedEvent}
                 accentIndex={index}
-                description={relatedEvent.shortDescription}
-                expandDescription
               />
             ))}
           </div>

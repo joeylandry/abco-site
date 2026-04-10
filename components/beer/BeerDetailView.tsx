@@ -107,17 +107,16 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
   return (
     <div className="bg-background">
       <section className="relative overflow-hidden md:hidden" style={{ backgroundColor: mobileDetailBackgroundColor }}>
-
         <div className="relative mx-auto max-w-3xl px-4 py-4" style={{ color: buttonTextColor }}>
           <div className="space-y-5">
-            <div className="relative space-y-1">
-              <div className="min-w-0 pr-[clamp(128px,32vw,180px)] text-left">
+            <div className="grid grid-cols-[minmax(0,1fr)_clamp(128px,32vw,180px)] items-start gap-x-4 gap-y-3">
+              <div className="min-w-0">
                 <h1 className="font-heading text-[clamp(2.8rem,13vw,4.2rem)] leading-[0.84] tracking-[-0.1em]">
                   {beer.name}
                 </h1>
               </div>
 
-              <div className="pointer-events-none absolute right-0 top-0 h-[clamp(194px,48vw,280px)] w-[clamp(128px,32vw,180px)]">
+              <div className="pointer-events-none relative row-span-2 h-[clamp(194px,48vw,280px)] w-[clamp(128px,32vw,180px)] justify-self-end">
                 <Image
                   src={mobileCanSrc}
                   alt=""
@@ -129,16 +128,16 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
               </div>
 
               <p
-                className="mx-auto pt-3 text-center text-[11px] font-semibold uppercase tracking-[0.22em]"
-                style={{ color: mobileMutedTextColor, maxWidth: "calc(100% - clamp(128px, 32vw, 180px))" }}
+                className="col-start-1 text-left text-[11px] font-semibold uppercase tracking-[0.22em]"
+                style={{ color: mobileMutedTextColor }}
               >
                 {beer.style.toUpperCase()}
                 {beerSpecs ? ` | ${beerSpecs}` : ""}
               </p>
             </div>
 
-            <div className="mx-auto max-w-[84%] pr-[clamp(128px,32vw,180px)] text-center">
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: mobileBodyTextColor }}>
+            <div className="w-full">
+              <p className="text-left text-sm leading-relaxed" style={{ color: mobileBodyTextColor }}>
                 {beer.longDescription ?? beer.shortDescription}
               </p>
 

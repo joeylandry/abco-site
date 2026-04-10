@@ -76,7 +76,7 @@ export default function MobileEventLocationLink({
   style,
   children,
 }: MobileEventLocationLinkProps) {
-  const preferredMapProvider = useSyncExternalStore(
+  const preferredMapProvider = useSyncExternalStore<MapProvider>(
     () => () => {},
     () => (isApplePlatform() ? "apple" : "google"),
     () => "google"

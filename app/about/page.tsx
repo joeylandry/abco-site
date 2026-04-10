@@ -44,7 +44,10 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <AboutHeader />
+      <div id="about-top">
+        <AboutHeader />
+        <HomeMission />
+      </div>
 
       <section className="border-t border-black/10 bg-background">
         <div className="mx-auto max-w-6xl px-6 pb-14 pt-4 sm:pb-16 sm:pt-6">
@@ -67,8 +70,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      <HomeMission />
 
       <section className="border-t border-black/10 bg-background py-12">
         <div className="mx-auto max-w-6xl px-6">

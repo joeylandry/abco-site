@@ -34,7 +34,7 @@ function MobileAnnouncementCard({
 
         <div className="relative z-10 flex min-h-[clamp(500px,132vw,690px)] flex-col px-5 py-5 text-left text-white">
           <div className="flex flex-col items-start justify-start pt-3">
-            <p className="font-heading text-[clamp(2rem,7.8vw,2.7rem)] leading-none tracking-tight whitespace-nowrap text-white">
+            <p className="font-heading text-[clamp(1.85rem,7vw,2.55rem)] leading-[0.95] tracking-tight text-balance text-white">
               {displayHeadline}
             </p>
             <p className="mt-3 w-full text-[0.95rem] leading-relaxed text-white/92 sm:text-base">

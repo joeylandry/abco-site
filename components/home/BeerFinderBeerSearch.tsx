@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react"
 import { useRouter } from "next/navigation"
-import { scrollToTopInstantly } from "@/lib/scrollToTop"
 
 type BeerFinderBeerSearchProps = {
   beers: Array<{
@@ -168,7 +167,6 @@ export default function BeerFinderBeerSearch({ beers, className }: BeerFinderBee
     }
 
     const queryString = params.toString()
-    scrollToTopInstantly()
     router.push(queryString ? `/beer-finder?${queryString}` : "/beer-finder")
   }
 

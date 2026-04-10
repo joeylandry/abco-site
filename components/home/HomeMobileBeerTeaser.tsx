@@ -6,6 +6,7 @@ const teaserBeers = mockBeers.slice(0, 6)
 
 type HomeMobileBeerTeaserProps = {
   variant?: "home" | "related"
+  backgroundColor?: string
 }
 
 function ArrowIcon() {
@@ -21,13 +22,19 @@ function ArrowIcon() {
   )
 }
 
-export default function HomeMobileBeerTeaser({ variant = "home" }: HomeMobileBeerTeaserProps) {
+export default function HomeMobileBeerTeaser({
+  variant = "home",
+  backgroundColor,
+}: HomeMobileBeerTeaserProps) {
   if (teaserBeers.length === 0) {
     return null
   }
 
   return (
-    <section className="bg-background py-6 md:hidden">
+    <section
+      className="bg-background py-6 md:hidden"
+      style={backgroundColor ? { backgroundColor } : undefined}
+    >
       <div className="w-full">
         <div className="mb-4 px-3">
           {variant === "home" ? (
@@ -36,7 +43,7 @@ export default function HomeMobileBeerTeaser({ variant = "home" }: HomeMobileBee
                 OUR
               </h2>
               <h2 className="font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
-                BEERS
+                <span>BEERS</span> <span className="whitespace-nowrap">. . .</span>
               </h2>
             </div>
           ) : (
@@ -44,7 +51,7 @@ export default function HomeMobileBeerTeaser({ variant = "home" }: HomeMobileBee
               <span className="flex flex-col gap-5">
                 <span className="block whitespace-nowrap">YOU MAY</span>
                 <span className="block">ALSO</span>
-                <span className="block">LIKE...</span>
+                <span className="block">LIKE . . .</span>
               </span>
             </h2>
           )}

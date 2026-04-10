@@ -4,7 +4,9 @@ import Image from "next/image"
 import Link from "next/link"
 import BeerCard, { type Beer } from "@/components/beer/BeerCard"
 import HomeMobileBeerTeaser from "@/components/home/HomeMobileBeerTeaser"
+import Button from "@/components/ui/Button"
 import { getBeerImageFrame, getBeerImageStyle } from "@/components/beer/beerImageFrame"
+import { getMobileBeerIconSrc } from "@/components/beer/mobileBeerArtwork"
 
 function formatPackaging(packaging: string[] | undefined) {
   if (!packaging?.length) {
@@ -34,6 +36,17 @@ function hexToRgba(hex: string, alpha: number) {
   const { r, g, b } = hexToRgb(hex)
 
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+function mixHex(baseHex: string, targetHex: string, weight: number) {
+  const base = hexToRgb(baseHex)
+  const target = hexToRgb(targetHex)
+  const mixChannel = (baseChannel: number, targetChannel: number) =>
+    Math.round(baseChannel + (targetChannel - baseChannel) * weight)
+
+  return `#${[mixChannel(base.r, target.r), mixChannel(base.g, target.g), mixChannel(base.b, target.b)]
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("")}`
 }
 
 function getGalleryAspectRatio(imageSrc: string) {
@@ -72,9 +85,15 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
       : [beer.image.primarySrc, beer.image.secondarySrc ?? beer.image.primarySrc, beer.image.primarySrc]
   const uniqueDetailImages = Array.from(new Set(detailImages))
   const mobileGalleryImages = uniqueDetailImages
+  const mobileCanSrc = getMobileBeerIconSrc(beer.id)
 
   const accentColor = beer.cardColor
-  const buttonTextColor = getRelativeLuminance(accentColor) < 0.34 ? "#FFFFFF" : "#161616"
+  const mobileDetailBackgroundColor = mixHex(accentColor, "#FFFFFF", 0.82)
+  const buttonTextColor = getRelativeLuminance(mobileDetailBackgroundColor) < 0.45 ? "#FFFFFF" : "#161616"
+  const mobileMutedTextColor = hexToRgba(buttonTextColor, 0.58)
+  const mobileBodyTextColor = hexToRgba(buttonTextColor, 0.84)
+  const mobileSurfaceColor = hexToRgba(buttonTextColor, 0.04)
+  const mobileSurfaceBorderColor = hexToRgba(buttonTextColor, 0.12)
   const beerSpecs = [beer.abv > 0 ? `${beer.abv}% ABV` : null, beer.ibu ? `${beer.ibu} IBU` : null]
     .filter((value): value is string => value !== null)
     .join(" | ")
@@ -87,94 +106,64 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
 
   return (
     <div className="bg-background">
-      <section className="relative overflow-hidden md:hidden">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundImage: heroBackdrop }}
-        />
+      <section className="relative overflow-hidden md:hidden" style={{ backgroundColor: mobileDetailBackgroundColor }}>
 
-        <div className="relative mx-auto max-w-3xl px-4 py-4">
-          <div className="mb-4">
-            <Link
-              href="/beer"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-black/70 transition hover:text-black"
-            >
-              <span aria-hidden="true">&larr;</span>
-              Back to beer
-            </Link>
-          </div>
-
+        <div className="relative mx-auto max-w-3xl px-4 py-4" style={{ color: buttonTextColor }}>
           <div className="space-y-5">
-            <div className="overflow-hidden border border-black/10 bg-surface shadow-sm">
-              <div className="px-5 py-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-black/50">
-                  Beer Detail
-                </p>
-                <h1 className="mt-2 font-heading text-4xl leading-none">{beer.name}</h1>
-                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-black/45">
-                  {beer.style}
-                </p>
-                {beerSpecs ? (
-                  <p className="mt-3 text-sm leading-relaxed text-black/70">{beerSpecs}</p>
-                ) : null}
-                <p className="mt-4 text-sm leading-relaxed text-black/85">
-                  {beer.longDescription ?? beer.shortDescription}
-                </p>
+            <div className="relative space-y-1">
+              <div className="min-w-0 pr-[clamp(128px,32vw,180px)] text-left">
+                <h1 className="font-heading text-[clamp(2.8rem,13vw,4.2rem)] leading-[0.84] tracking-[-0.1em]">
+                  {beer.name}
+                </h1>
+              </div>
 
-                <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-black/10 pt-4">
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/45">
-                      Availability
-                    </dt>
-                    <dd className="mt-1 text-sm text-black/80">
-                      {formatAvailability(beer.availability)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/45">
-                      Packaging
-                    </dt>
-                    <dd className="mt-1 text-sm text-black/80">
-                      {formatPackaging(beer.packaging)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/45">
-                      Attributes
-                    </dt>
-                    <dd className="mt-1 text-sm text-black/80">
-                      {beer.tags?.length ? beer.tags.join(", ") : "Details coming soon"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/45">
-                      Pour Notes
-                    </dt>
-                    <dd className="mt-1 text-sm text-black/80">{beer.shortDescription}</dd>
-                  </div>
-                </dl>
+              <div className="pointer-events-none absolute right-0 top-0 h-[clamp(194px,48vw,280px)] w-[clamp(128px,32vw,180px)]">
+                <Image
+                  src={mobileCanSrc}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 32vw, 180px"
+                  className="origin-top-right object-contain rotate-[2deg]"
+                  priority={false}
+                />
+              </div>
 
-                <div className="mt-5 flex flex-col gap-3">
-                  <Link
-                    href={`/beer-finder?beer=${encodeURIComponent(beer.id)}`}
-                    className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold tracking-wide shadow-sm transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
-                    style={{
-                      backgroundColor: accentColor,
-                      color: buttonTextColor,
-                    }}
-                  >
-                    Find this beer
-                  </Link>
-                </div>
+              <p
+                className="mx-auto pt-3 text-center text-[11px] font-semibold uppercase tracking-[0.22em]"
+                style={{ color: mobileMutedTextColor, maxWidth: "calc(100% - clamp(128px, 32vw, 180px))" }}
+              >
+                {beer.style.toUpperCase()}
+                {beerSpecs ? ` | ${beerSpecs}` : ""}
+              </p>
+            </div>
+
+            <div className="mx-auto max-w-[84%] pr-[clamp(128px,32vw,180px)] text-center">
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: mobileBodyTextColor }}>
+                {beer.longDescription ?? beer.shortDescription}
+              </p>
+
+              <div className="mt-4 flex justify-center">
+                <Button
+                  href={`/beer-finder?beer=${encodeURIComponent(beer.id)}`}
+                  className="border border-black/30 bg-transparent text-black shadow-none hover:bg-transparent hover:text-black hover:opacity-100 hover:shadow-none"
+                >
+                  FIND THIS BEER
+                </Button>
               </div>
             </div>
 
             <div className="space-y-4">
-              {mobileGalleryImages.slice(0, 3).map((imageSrc, index) => (
+              {mobileGalleryImages.slice(0, 2).map((imageSrc, index) => (
                 <div
                   key={`${beer.id}-${imageSrc}-${index}`}
-                  className="relative w-full overflow-hidden border border-black/10 bg-black/[0.03] shadow-sm"
-                  style={{ aspectRatio: getGalleryAspectRatio(imageSrc) }}
+                  className="relative w-full overflow-hidden shadow-sm"
+                  style={{
+                    aspectRatio: getGalleryAspectRatio(imageSrc),
+                    backgroundColor: mobileSurfaceColor,
+                    borderColor: mobileSurfaceBorderColor,
+                    borderWidth: "1px",
+                    borderStyle: "solid",
+                  }}
                 >
                   <Image
                     src={imageSrc}
@@ -191,7 +180,7 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
         </div>
       </section>
 
-      <HomeMobileBeerTeaser variant="related" />
+      <HomeMobileBeerTeaser variant="related" backgroundColor={mobileDetailBackgroundColor} />
 
       <section className="relative hidden overflow-hidden md:block">
         <div

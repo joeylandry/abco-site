@@ -7,8 +7,9 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { useRouter } from "next/navigation"
 import { mockBeers } from "@/app/beer/mockBeers"
 import type { BeerFinderLocation } from "@/lib/breww"
-import { scrollToTopInstantly } from "@/lib/scrollToTop"
+import MobileDrawerHeader from "@/components/layout/MobileDrawerHeader"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
+import { BEER_FINDER_MOBILE_ICON_SRC } from "@/components/beer/mobileBeerArtwork"
 import {
   getLeaflet,
   hasCoordinates,
@@ -550,12 +551,11 @@ function MobileBeerFinder({
   initialZip,
 }: MobileBeerFinderProps) {
   const router = useRouter()
+  const initialSelectedBeerFilters = initialSelectedBeers.filter((beerName) => beerFinderCoverFilterNameSet.has(beerName))
   const [zipCode, setZipCode] = useState(() => initialZip ?? "")
   const [beerFilterSearch, setBeerFilterSearch] = useState("")
   const [selectedVenueFilters, setSelectedVenueFilters] = useState<VenueFilterId[]>([])
-  const [selectedBeerFilters, setSelectedBeerFilters] = useState(() =>
-    initialSelectedBeers.filter((beerName) => beerFinderCoverFilterNameSet.has(beerName))
-  )
+  const [selectedBeerFilters, setSelectedBeerFilters] = useState(() => initialSelectedBeerFilters)
   const [zipSearchCoordinates, setZipSearchCoordinates] = useState<CurrentLocation | null>(null)
   const [isZipLookupPending, setIsZipLookupPending] = useState(false)
   const [zipLookupError, setZipLookupError] = useState<string | null>(null)
@@ -565,9 +565,9 @@ function MobileBeerFinder({
   const [leafletReady, setLeafletReady] = useState(false)
   const [preferredMapProvider, setPreferredMapProvider] = useState<MapProvider>("google")
   const [visibleLocationCount, setVisibleLocationCount] = useState(MOBILE_LOCATION_BATCH_SIZE)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isDrawerRendered, setIsDrawerRendered] = useState(false)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(() => initialSelectedBeerFilters.length > 0)
+  const [isDrawerRendered, setIsDrawerRendered] = useState(() => initialSelectedBeerFilters.length > 0)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(() => initialSelectedBeerFilters.length > 0)
   const openTimerRef = useRef<number | null>(null)
   const closeTimerRef = useRef<number | null>(null)
   const scrollYRef = useRef(0)
@@ -578,8 +578,6 @@ function MobileBeerFinder({
     overflow: string
     touchAction: string
   } | null>(null)
-  const filterMenuRef = useRef<HTMLDivElement | null>(null)
-  const filterButtonRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     setPreferredMapProvider(isApplePlatform() ? "apple" : "google")
@@ -869,44 +867,6 @@ function MobileBeerFinder({
     }
   }, [handleCloseFilterMenu, isDrawerRendered])
 
-  useEffect(() => {
-    if (!isMenuOpen) {
-      return
-    }
-
-    function handlePointerDown(event: MouseEvent | TouchEvent) {
-      const target = event.target as Node | null
-
-      if (
-        (filterMenuRef.current && filterMenuRef.current.contains(target)) ||
-        (filterButtonRef.current && filterButtonRef.current.contains(target))
-      ) {
-        return
-      }
-
-      handleCloseFilterMenu()
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape") {
-        return
-      }
-
-      handleCloseFilterMenu()
-      filterButtonRef.current?.focus()
-    }
-
-    document.addEventListener("mousedown", handlePointerDown)
-    document.addEventListener("touchstart", handlePointerDown)
-    document.addEventListener("keydown", handleKeyDown)
-
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown)
-      document.removeEventListener("touchstart", handlePointerDown)
-      document.removeEventListener("keydown", handleKeyDown)
-    }
-  }, [handleCloseFilterMenu, isMenuOpen])
-
   const toggleBeerFilter = (beerName: string) => {
     setSelectedBeerFilters((currentFilters) =>
       currentFilters.includes(beerName)
@@ -937,7 +897,6 @@ function MobileBeerFinder({
       params.append("beer", beerName)
     }
 
-    scrollToTopInstantly()
     router.push(`/beer-finder?${params.toString()}`)
   }
 
@@ -957,17 +916,17 @@ function MobileBeerFinder({
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 sm:px-6">
             <div className="flex flex-col gap-3">
               <div className="flex items-end gap-2">
-                <h2 className="max-w-[56%] font-heading text-[clamp(4.1rem,20vw,6.5rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
-                  <span className="flex flex-col gap-6">
-                    <span className="block">FIND</span>
-                    <span className="block">OUR</span>
-                    <span className="block">BEER</span>
-                  </span>
-                </h2>
+                  <h2 className="max-w-[56%] font-heading text-[clamp(4.1rem,20vw,6.5rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black">
+                    <span className="flex flex-col gap-6">
+                      <span className="block">FIND</span>
+                      <span className="block">OUR</span>
+                      <span className="block">BEER!</span>
+                    </span>
+                  </h2>
 
                 <div className="pointer-events-none relative -mr-4 h-[clamp(220px,60vw,324px)] w-[clamp(146px,44vw,224px)] shrink-0 self-end">
                   <Image
-                    src="/my_juicy_gf_cutout.png"
+                    src={BEER_FINDER_MOBILE_ICON_SRC}
                     alt=""
                     fill
                     sizes="(max-width: 768px) 44vw, 224px"
@@ -979,7 +938,6 @@ function MobileBeerFinder({
 
               <div className="flex justify-end">
                 <button
-                  ref={filterButtonRef}
                   type="button"
                   onClick={handleToggleFilterMenu}
                   aria-expanded={isMenuOpen}
@@ -1170,7 +1128,6 @@ function MobileBeerFinder({
               />
 
               <div
-                ref={filterMenuRef}
                 id="beer-finder-mobile-filter-menu"
                 role="dialog"
                 aria-modal="true"
@@ -1179,30 +1136,8 @@ function MobileBeerFinder({
                   isDrawerOpen ? "translate-x-0" : "translate-x-full"
                 }`}
                 {...drawerSwipeHandlers}
-              >
-                <div className="flex items-start justify-between gap-4 border-b border-black/10 px-5 py-4">
-                  <h2 className="font-heading text-3xl leading-none text-black">Filter</h2>
-
-                  <button
-                    type="button"
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-neutral-800 transition hover:border-black/20 hover:text-neutral-950"
-                    aria-label="Close beer filters"
-                    onClick={handleCloseFilterMenu}
-                  >
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    >
-                      <path d="M6 6l12 12" />
-                      <path d="M18 6 6 18" />
-                    </svg>
-                  </button>
-                </div>
+                >
+                <MobileDrawerHeader closeLabel="Close beer filters" title="Filter" onClose={handleCloseFilterMenu} />
 
                 <div className="grid gap-6 px-5 py-5 pb-10">
                   <div className="grid gap-3">

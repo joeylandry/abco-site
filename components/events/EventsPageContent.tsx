@@ -7,7 +7,6 @@ import Button from "@/components/ui/Button"
 import EventCard from "@/components/events/EventCard"
 import EventTag from "@/components/events/EventTag"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
-import { scrollToTopInstantly } from "@/lib/scrollToTop"
 import { pastEvents, upcomingEvents, type EventItem } from "@/app/events/mockEvents"
 
 const SECONDARY_EVENT_BUTTON_CLASS =
@@ -30,7 +29,6 @@ function CompactUpcomingEventCard({
   const theme = getEventCardTheme(accentIndex)
 
   const navigateToEvent = () => {
-    scrollToTopInstantly()
     router.push(href)
   }
 
@@ -123,7 +121,6 @@ export default function EventsPageContent() {
 
   const navigateToFeaturedEvent = () => {
     if (!nextEvent) return
-    scrollToTopInstantly()
     router.push(nextEvent.href)
   }
 

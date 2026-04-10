@@ -3,7 +3,6 @@
 import Button from "@/components/ui/Button"
 import EventTag from "@/components/events/EventTag"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
-import { scrollToTopInstantly } from "@/lib/scrollToTop"
 import { useRouter } from "next/navigation"
 import type { KeyboardEvent, MouseEvent } from "react"
 
@@ -39,7 +38,6 @@ export default function EventCard({
   const theme = getEventCardTheme(accentIndex)
 
   const navigateToEvent = () => {
-    scrollToTopInstantly()
     router.push(href)
   }
 

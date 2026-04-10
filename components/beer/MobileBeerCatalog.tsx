@@ -6,6 +6,7 @@ import type { BeerAvailability } from "@/components/beer/BeerCard"
 import MobileBeerCard from "@/components/beer/MobileBeerCard"
 import { getBeerAttributeOptions, mockBeers } from "@/app/beer/mockBeers"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
+import MobileDrawerHeader from "@/components/layout/MobileDrawerHeader"
 
 const availabilityOptions: Array<{ value: "all" | BeerAvailability; label: string }> = [
   { value: "all", label: "All beers" },
@@ -19,7 +20,7 @@ function FilterIcon() {
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="h-6 w-6"
+      className="h-5 w-5"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
@@ -221,7 +222,7 @@ export default function MobileBeerCatalog() {
                 aria-expanded={isMenuOpen}
                 aria-controls="mobile-beer-filter-menu"
                 aria-haspopup="dialog"
-                className={`pointer-events-auto relative inline-flex shrink-0 items-center gap-2.5 rounded-full border px-3.5 py-2.5 text-base font-semibold shadow-[0_12px_26px_rgba(15,23,42,0.12)] transition ${
+                className={`pointer-events-auto relative inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-[0.72rem] font-semibold uppercase tracking-[0.18em] transition ${
                   hasActiveFilters
                     ? "border-[#0f172a] bg-[#0f172a] text-white"
                     : "border-black/10 bg-white/95 text-neutral-700 hover:text-neutral-900"
@@ -273,40 +274,12 @@ export default function MobileBeerCatalog() {
                   isDrawerOpen ? "translate-x-0" : "translate-x-full"
                 }`}
                 {...drawerSwipeHandlers}
-              >
-                <div className="flex items-start justify-between gap-4 border-b border-black/8 px-5 py-4">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                      Filters
-                    </p>
-                    <h2 className="mt-1 font-heading text-3xl leading-none text-black">
-                      Beer Menu
-                    </h2>
-                    <p className="mt-2 max-w-[18rem] text-xs leading-relaxed text-neutral-500">
-                      Viewer note: this filter menu is functional, but the visual design is still a placeholder.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white text-neutral-800 transition hover:border-black/20 hover:text-neutral-950"
-                    aria-label="Close beer filters"
-                    onClick={closeMenu}
-                  >
-                    <svg
-                      aria-hidden="true"
-                      viewBox="0 0 24 24"
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    >
-                      <path d="M6 6l12 12" />
-                      <path d="M18 6 6 18" />
-                    </svg>
-                  </button>
-                </div>
+                >
+                <MobileDrawerHeader
+                  closeLabel="Close beer filters"
+                  title="Beer Menu"
+                  onClose={closeMenu}
+                />
 
                 <div className="grid gap-6 px-5 py-5 pb-10">
                   <div className="grid gap-3">

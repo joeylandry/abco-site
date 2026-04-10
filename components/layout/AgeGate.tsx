@@ -123,68 +123,69 @@ export default function AgeGate() {
         aria-modal="true"
         aria-labelledby="abco-age-gate-title"
         className={[
-          "relative w-full max-w-md overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-2xl md:max-w-5xl md:border-0 md:bg-transparent md:shadow-none",
+          "relative w-full max-w-md overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-2xl md:max-w-5xl",
           "transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none",
           isExiting ? "translate-y-1 scale-[0.98] opacity-0" : "translate-y-0 scale-100 opacity-100",
         ].join(" ")}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="relative hidden min-h-[560px] items-center justify-center px-10 py-12 md:flex">
-          <div className="absolute inset-0">
+        <div className="hidden min-h-[320px] md:flex">
+          <div className="relative flex w-[42%] items-center justify-center overflow-hidden border-r border-black/10">
             <Image
               src="/tom_gate.jpg"
               alt="ABCo age gate background"
               fill
               priority
-              sizes="100vw"
+              sizes="42vw"
               className="object-cover brightness-110 contrast-105"
               style={{ objectPosition: "40% center" }}
             />
-            <div className="absolute inset-0 bg-black/45" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/20" />
-          </div>
-
-          <div className="relative z-10 flex w-full max-w-2xl flex-col items-center rounded-[2rem] border border-white/15 bg-white/82 px-10 py-12 text-center shadow-2xl backdrop-blur-sm">
+            <div className="absolute inset-0 bg-black/35" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/15" />
             <Image
               src="/main_logo_full.png"
               alt="ABCo"
               width={520}
               height={220}
               priority
-              className="h-auto w-full max-w-[360px] invert"
+              className="relative z-10 h-auto w-full max-w-[360px] invert"
             />
+          </div>
 
-            <h2 className="mt-8 text-4xl font-semibold tracking-tight text-black">
-              Are you 21+?
-            </h2>
+          <div className="flex flex-1 items-center p-10">
+            <div className="w-full max-w-2xl">
+              <h2 className="text-4xl font-semibold tracking-tight text-black">
+                Are you 21+?
+              </h2>
 
-            <div className="mt-8 flex w-full gap-3">
-              <Button
-                type="button"
-                onClick={handleDecline}
-                className="flex-1 border border-black bg-white !px-4 !py-3 !text-base !leading-none !tracking-normal text-black shadow-none hover:bg-black hover:text-white hover:!translate-y-0"
-              >
-                No
-              </Button>
-              <Button
-                id="abco-age-gate-confirm-desktop"
-                type="button"
-                onClick={handleConfirm}
-                className="flex-1 bg-black !px-4 !py-3 !text-base !leading-none !tracking-normal text-white shadow-none hover:opacity-95 hover:!translate-y-0"
-              >
-                Yes
-              </Button>
+              <div className="mt-8 flex w-full gap-3">
+                <Button
+                  type="button"
+                  onClick={handleDecline}
+                  className="flex-1 border border-black bg-white !px-4 !py-3 !text-base !leading-none !tracking-normal text-black shadow-none hover:bg-black hover:text-white hover:!translate-y-0"
+                >
+                  No
+                </Button>
+                <Button
+                  id="abco-age-gate-confirm-desktop"
+                  type="button"
+                  onClick={handleConfirm}
+                  className="flex-1 bg-black !px-4 !py-3 !text-base !leading-none !tracking-normal text-white shadow-none hover:opacity-95 hover:!translate-y-0"
+                >
+                  Yes
+                </Button>
+              </div>
+
+              <label className="mt-4 flex select-none items-center justify-center gap-2 text-sm text-black/70">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                  className="h-4 w-4 rounded border-black/40 text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                />
+                Remember me
+              </label>
             </div>
-
-            <label className="mt-4 flex select-none items-center justify-center gap-2 text-sm text-black/70">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(event) => setRememberMe(event.target.checked)}
-                className="h-4 w-4 rounded border-black/40 text-black focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-              />
-              Remember me
-            </label>
           </div>
         </div>
 

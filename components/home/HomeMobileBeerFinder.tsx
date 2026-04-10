@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useState, type FormEvent } from "react"
-import { scrollToTopInstantly } from "@/lib/scrollToTop"
+import { HOME_MOBILE_BEER_FINDER_ICON_SRC } from "@/components/beer/mobileBeerArtwork"
 
 const ZIP_CODE_PATTERN = /^\d{5}$/
 
@@ -28,12 +28,10 @@ export default function HomeMobileBeerFinder() {
     const params = new URLSearchParams()
     params.set("zip", trimmedZipCode)
 
-    scrollToTopInstantly()
     router.push(`/beer-finder?${params.toString()}`)
   }
 
   function handleNearMe() {
-    scrollToTopInstantly()
     router.push("/beer-finder")
   }
 
@@ -46,13 +44,13 @@ export default function HomeMobileBeerFinder() {
               <span className="flex flex-col gap-6">
                 <span className="block">FIND</span>
                 <span className="block">OUR</span>
-                <span className="block">BEER</span>
+                <span className="block">BEER!</span>
               </span>
             </h2>
 
             <div className="pointer-events-none relative -mr-4 h-[clamp(220px,60vw,324px)] w-[clamp(146px,44vw,224px)] shrink-0 self-end">
               <Image
-                src="/my_juicy_gf_cutout.png"
+                src={HOME_MOBILE_BEER_FINDER_ICON_SRC}
                 alt=""
                 fill
                 sizes="(max-width: 768px) 44vw, 224px"

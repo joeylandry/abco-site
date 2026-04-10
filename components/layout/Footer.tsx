@@ -85,30 +85,36 @@ export default function Footer() {
       <div className="relative mx-auto max-w-7xl px-5 pt-6 pb-4 sm:px-6 md:pt-8">
         <div className="grid grid-cols-2 gap-x-5 gap-y-5 sm:gap-6 lg:grid-cols-5 lg:gap-12">
           {/* Logo + Brand */}
-          <div className="col-span-2 space-y-3 lg:col-span-1">
-            <Link href="/" aria-label="Arlington Brewing Company homepage" className="inline-block">
-              <Image
-                src="/monogram_logo.png"
-                alt="Arlington Brewing Company Monogram"
-                width={70}
-                height={70}
-                className="h-auto w-auto opacity-90"
-              />
-            </Link>
-            <div className="space-y-1.5 text-sm leading-6 text-black/80">
-              <address className="not-italic leading-relaxed">
-                <a
-                  href={googleMapsUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="transition hover:text-black"
-                >
-                  {addressLine1}
-                  <br />
-                  {addressLine2}
-                </a>
-              </address>
-              <p>Phone coming soon</p>
+          <div className="col-span-2 lg:col-span-1">
+            <div className="flex items-start gap-4 lg:block lg:space-y-3">
+              <Link
+                href="/"
+                aria-label="Arlington Brewing Company homepage"
+                className="inline-block shrink-0"
+              >
+                <Image
+                  src="/monogram_logo.png"
+                  alt="Arlington Brewing Company Monogram"
+                  width={70}
+                  height={70}
+                  className="h-auto w-auto opacity-90"
+                />
+              </Link>
+              <div className="min-w-0 flex-1 space-y-1.5 text-sm leading-6 text-black/80">
+                <address className="not-italic leading-relaxed">
+                  <a
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="transition hover:text-black"
+                  >
+                    {addressLine1}
+                    <br />
+                    {addressLine2}
+                  </a>
+                </address>
+                <p>Phone coming soon</p>
+              </div>
             </div>
           </div>
 

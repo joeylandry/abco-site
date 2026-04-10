@@ -7,7 +7,6 @@ import { useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 
 import { flushSync } from "react-dom"
 import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/config/nav"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
-import { scrollToTopInstantly } from "@/lib/scrollToTop"
 
 const SOCIAL_LINKS = [
   {
@@ -26,8 +25,8 @@ const DRAWER_ADDRESS = ["15 Ryder St", "Arlington, MA 02476"]
 const DRAWER_HOURS = ["Opening in 2026", "Taproom hours coming soon"]
 const DRAWER_PHONE = "Phone: (coming soon)"
 const DRAWER_TRANSITION_MS = 350
-const MOBILE_EDGE_SWIPE_TRIGGER_PX = 12
-const MOBILE_EDGE_SWIPE_OPEN_THRESHOLD = 0.72
+const MOBILE_EDGE_SWIPE_TRIGGER_PX = 8
+const MOBILE_EDGE_SWIPE_OPEN_THRESHOLD = 0.84
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
@@ -182,7 +181,6 @@ export default function MobileMenu() {
       flushSync(() => {
         unlockBodyScroll()
         setIsDrawerRendered(false)
-        scrollToTopInstantly()
       })
       return
     }
@@ -305,7 +303,7 @@ export default function MobileMenu() {
     const distanceDragged = swipeState.startX - swipeState.lastX
     const shouldOpen =
       (typeof progress === "number" && progress <= MOBILE_EDGE_SWIPE_OPEN_THRESHOLD) ||
-      distanceDragged >= drawerWidth * 0.25
+      distanceDragged >= drawerWidth * 0.2
 
     if (shouldOpen) {
       finishSwipeOpen()
@@ -366,16 +364,14 @@ export default function MobileMenu() {
         </svg>
       </button>
 
-      {!isDrawerRendered ? (
-        <div
-          className="fixed bottom-0 right-0 top-[4.75rem] z-[40] w-7 md:hidden touch-pan-y"
-          aria-hidden="true"
-          onTouchStart={onEdgeTouchStart}
-          onTouchMove={onEdgeTouchMove}
-          onTouchEnd={onEdgeTouchEnd}
-          onTouchCancel={onEdgeTouchCancel}
-        />
-      ) : null}
+      <div
+        className="fixed bottom-0 right-0 top-[4.75rem] z-[40] w-7 md:hidden touch-pan-y"
+        aria-hidden="true"
+        onTouchStart={onEdgeTouchStart}
+        onTouchMove={onEdgeTouchMove}
+        onTouchEnd={onEdgeTouchEnd}
+        onTouchCancel={onEdgeTouchCancel}
+      />
 
       {isDrawerRendered && typeof document !== "undefined"
         ? createPortal(
@@ -512,7 +508,7 @@ export default function MobileMenu() {
 
                   <div className="border-t border-black/8 pt-6">
                     <div className="relative min-h-[clamp(20rem,52vw,26rem)] overflow-hidden">
-                      <div className="pointer-events-none absolute left-1 top-1/2 h-[clamp(272px,66vw,360px)] w-[clamp(188px,50vw,248px)] -translate-y-1/2 translate-x-0 rotate-[-8deg]">
+                      <div className="pointer-events-none absolute left-1 top-1/2 h-[clamp(272px,66vw,360px)] w-[clamp(188px,50vw,248px)] -translate-y-1/2 -translate-x-1 rotate-[-8deg]">
                         <Image
                           src="/spy_p_a_cutout.png"
                           alt=""

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import BeerCard, { type BeerAvailability } from "@/components/beer/BeerCard"
 import { getBeerAttributeOptions, mockBeers } from "@/app/beer/mockBeers"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
+import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
 
 const availabilityOptions: Array<{ value: "all" | BeerAvailability; label: string }> = [
   { value: "all", label: "All beers" },
@@ -74,6 +75,9 @@ export default function BeerCatalog() {
 
   const activeFilterCount = Number(availability !== "all") + Number(selectedTag !== "all")
   const hasActiveFilters = activeFilterCount > 0
+  // Match the button's right edge to the rightmost beer card when the 4-column grid caps at 260px.
+  const desktopFilterButtonInset =
+    "max(0px, calc((min(100vw, 80rem) - 3rem - 3.75rem - 65rem) / 8))"
 
   useEffect(() => {
     if (!isDrawerRendered) {
@@ -212,7 +216,7 @@ export default function BeerCatalog() {
       <div className="mx-auto max-w-7xl px-6 py-8 sm:py-10">
         <div className="grid gap-y-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-6">
           <div>
-            <h2 className="font-heading text-3xl text-foreground sm:text-4xl">
+            <h2 className={DESKTOP_EVENT_SECTION_HEADING_CLASS}>
               Explore Our Beers
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-foreground/75 sm:text-base">
@@ -220,8 +224,11 @@ export default function BeerCatalog() {
             </p>
           </div>
 
-          <div className="sticky top-[5.5rem] z-40 max-w-full lg:justify-self-end">
-            <div className="flex max-w-full items-center justify-end">
+          <div className="fixed inset-x-0 top-[5.25rem] z-50 pointer-events-none px-6">
+            <div
+              className="mx-auto flex max-w-7xl justify-end"
+              style={{ paddingRight: desktopFilterButtonInset }}
+            >
               <button
                 type="button"
                 onClick={openMenu}
@@ -229,7 +236,7 @@ export default function BeerCatalog() {
                 aria-expanded={isMenuOpen}
                 aria-controls="desktop-beer-filter-menu"
                 aria-haspopup="dialog"
-                className={`relative inline-flex shrink-0 items-center gap-2.5 rounded-full border px-3.5 py-2.5 text-base font-semibold shadow-[0_12px_26px_rgba(15,23,42,0.12)] transition ${
+                className={`pointer-events-auto relative inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-[0.72rem] font-semibold uppercase tracking-[0.18em] transition ${
                   hasActiveFilters
                     ? "border-[#0f172a] bg-[#0f172a] text-white"
                     : "border-black/10 bg-white/95 text-neutral-700 hover:text-neutral-900"

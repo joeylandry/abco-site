@@ -138,7 +138,7 @@ export default function AgeGate() {
               priority
               sizes="42vw"
               className="object-cover brightness-110 contrast-105"
-              style={{ objectPosition: "40% center" }}
+              style={{ objectPosition: "25% center" }}
             />
             <div className="absolute inset-0 bg-black/35" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/15" />

@@ -4,10 +4,10 @@ import HomeMobileAnnouncements from "@/components/home/HomeMobileAnnouncements";
 import HomeMobileBeerFinder from "@/components/home/HomeMobileBeerFinder";
 import HomeMobileNextEvent from "@/components/home/HomeMobileNextEvent";
 import HomeMobileBeerTeaser from "@/components/home/HomeMobileBeerTeaser";
-import HomeOpeningAnnouncement from "@/components/home/HomeOpeningAnnouncement";
 import HomeNextEvent from "@/components/home/HomeNextEvent";
 import HomeFeaturedBeers from "@/components/home/HomeFeaturedBeers";
 import type { Metadata } from "next";
+import HomeDesktopAnnouncement from "@/components/home/HomeDesktopAnnouncement";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -21,9 +21,9 @@ export default function HomePage() {
       <div className="hidden md:block">
         <HomeHeroB />
       </div>
+      <HomeDesktopAnnouncement />
       <HomeMobileAnnouncements />
       <HomeMobileBeerFinder />
-      <HomeOpeningAnnouncement />
       <HomeMobileNextEvent />
       <HomeMobileBeerTeaser />
       <HomeNextEvent />

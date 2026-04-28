@@ -47,13 +47,19 @@ export function formatMobileEventBackDate(weekday: string, month: string, day: n
 export function MobileEventBadge({
   label,
   mutedTextColor,
+  compact = false,
 }: {
   label: string
   mutedTextColor: string
+  compact?: boolean
 }) {
+  const badgeClassName = compact
+    ? "inline-flex items-center gap-1.5 rounded-full border border-current/15 bg-white/12 px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.15em] shadow-[0_10px_22px_rgba(0,0,0,0.08)] backdrop-blur-sm"
+    : "inline-flex items-center gap-2 rounded-full border border-current/15 bg-white/12 px-3.5 py-1.5 text-[0.78rem] font-semibold uppercase tracking-[0.18em] shadow-[0_10px_22px_rgba(0,0,0,0.08)] backdrop-blur-sm"
+
   return (
     <span
-      className="inline-flex items-center gap-2 rounded-full border border-current/15 bg-white/12 px-3.5 py-1.5 text-[0.78rem] font-semibold uppercase tracking-[0.18em] shadow-[0_10px_22px_rgba(0,0,0,0.08)] backdrop-blur-sm"
+      className={badgeClassName}
       style={{ color: mutedTextColor }}
     >
       <CalendarIcon />

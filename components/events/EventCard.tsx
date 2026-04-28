@@ -72,7 +72,7 @@ export default function EventCard({
         >
           {inHouseEvent ? (
             <div className={`flex basis-full justify-center ${compactTag ? "" : "sm:mb-2 sm:block"}`}>
-              <EventTag iconOnly={compactTag} label="In-House Event" />
+              <EventTag iconOnly={compactTag} label="TAP ROOM EVENT" />
             </div>
           ) : null}
           {weekday ? (

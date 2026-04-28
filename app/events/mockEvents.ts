@@ -43,7 +43,7 @@ export const upcomingEvents: EventItem[] = [
     href: "/events/april-10-arlington-jazz-festival",
     imageSrc: "/events/jazz_fest.jpg",
     detailImages: buildEventDetailImages("/events/jazz_fest.jpg"),
-    inHouseEvent: false,
+    inHouseEvent: true,
     calendarStart: "2026-04-10T16:30:00-04:00",
     calendarEnd: "2026-04-10T22:00:00-04:00",
   },

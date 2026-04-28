@@ -26,6 +26,11 @@ const fallbackAnnouncements: HomeAnnouncement[] = [
   },
 ]
 
+const desktopFallbackAnnouncements: HomeAnnouncement[] = fallbackAnnouncements.map((announcement) => ({
+  ...announcement,
+  placement: "desktop",
+}))
+
 export async function getHomeMobileAnnouncements() {
   try {
     const announcements = await client.fetch<HomeAnnouncement[]>(
@@ -63,5 +68,45 @@ export async function getHomeMobileAnnouncements() {
     }))
   } catch {
     return fallbackAnnouncements
+  }
+}
+
+export async function getHomeDesktopAnnouncement() {
+  try {
+    const announcements = await client.fetch<HomeAnnouncement[]>(
+      `*[
+        _type == "homeAnnouncement" &&
+        active == true &&
+        (!defined(placement) || placement in ["desktop", "both"])
+      ] | order(coalesce(sortOrder, 9999) asc, _createdAt asc) {
+        _id,
+        headline,
+        subtitle,
+        ctaLabel,
+        ctaHref,
+        "imageUrl": image.asset->url,
+        "imageAlt": coalesce(image.alt, headline),
+        placement,
+        sortOrder
+      }`
+    )
+
+    if (announcements.length === 0) {
+      return desktopFallbackAnnouncements
+    }
+
+    return announcements.map((announcement) => ({
+      ...announcement,
+      headline: announcement.headline || fallbackAnnouncements[0].headline,
+      subtitle: announcement.subtitle || fallbackAnnouncements[0].subtitle,
+      ctaLabel: announcement.ctaLabel || fallbackAnnouncements[0].ctaLabel,
+      ctaHref: announcement.ctaHref || fallbackAnnouncements[0].ctaHref,
+      imageUrl: announcement.imageUrl || fallbackAnnouncements[0].imageUrl,
+      imageAlt: announcement.imageAlt || fallbackAnnouncements[0].imageAlt,
+      placement: announcement.placement || "desktop",
+      sortOrder: announcement.sortOrder ?? 0,
+    }))
+  } catch {
+    return desktopFallbackAnnouncements
   }
 }

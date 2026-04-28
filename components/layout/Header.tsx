@@ -8,7 +8,7 @@ export default function Header() {
   return (
     <>
       <MobileHeader />
-      <header className="sticky top-0 z-50 hidden w-full border-b border-black/10 bg-white/65 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-white/50 md:block">
+      <header className="fixed inset-x-0 top-0 z-50 hidden w-full border-b border-black/10 bg-white/65 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-white/50 md:block">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-0.5">
           <Link href="/" className="flex shrink-0 items-center self-center leading-none">
             <Image

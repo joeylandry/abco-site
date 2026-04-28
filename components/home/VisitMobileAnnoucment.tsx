@@ -1,6 +1,6 @@
 import Button from "@/components/ui/Button"
 
-export default function HomeMobileOpeningAnnouncement() {
+export default function VisitMobileAnnoucment() {
   return (
     <section className="border-t border-black/10 bg-background py-4 md:hidden">
       <div className="mx-auto max-w-md px-4">

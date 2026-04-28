@@ -33,20 +33,16 @@ export default function HomeHeroBMobile() {
       <div className="relative h-[74svh] min-h-[520px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            key={`mobile-hero-active-${activeIndex}`}
             src={mobileHeroImages[activeIndex]}
             alt="ABCo hero background"
             fill
             priority
             sizes="100vw"
-            className={`transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none ${getMobileHeroImageClass(
-              activeIndex
-            )} ${incomingIndex !== null && incomingVisible ? "opacity-0" : "opacity-100"}`}
+            className={`opacity-100 ${getMobileHeroImageClass(activeIndex)}`}
           />
 
           {incomingIndex !== null ? (
             <Image
-              key={`mobile-hero-incoming-${incomingIndex}`}
               src={mobileHeroImages[incomingIndex]}
               alt="ABCo hero background"
               fill

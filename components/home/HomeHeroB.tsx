@@ -19,7 +19,10 @@ const desktopHeroImages = [
 ];
 
 export default function HomeHeroB() {
-  const { activeIndex } = useCrossfadeCarousel(desktopHeroImages, { fadeMs: 0 });
+  const { activeIndex, incomingIndex, incomingVisible } = useCrossfadeCarousel(desktopHeroImages, {
+    intervalMs: 10000,
+    fadeMs: 1200,
+  });
 
   return (
     <section className="relative min-h-[calc(100vh-72px)] w-full overflow-hidden">
@@ -30,8 +33,20 @@ export default function HomeHeroB() {
           fill
           priority
           sizes="100vw"
-          className="object-cover brightness-110 contrast-105"
+          className="object-cover brightness-110 contrast-105 opacity-100"
         />
+
+        {incomingIndex !== null ? (
+          <Image
+            src={desktopHeroImages[incomingIndex]}
+            alt="ABCo hero background"
+            fill
+            sizes="100vw"
+            className={`transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none object-cover brightness-110 contrast-105 ${
+              incomingVisible ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ) : null}
       </div>
 
       <div className="absolute inset-0 bg-black/35" />

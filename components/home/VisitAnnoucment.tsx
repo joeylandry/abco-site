@@ -2,7 +2,7 @@ import Button from "@/components/ui/Button"
 import BreweryLocationWidget from "@/components/location/BreweryLocationWidget"
 import Image from "next/image"
 
-export default function HomeOpeningAnnouncement() {
+export default function VisitAnnoucment() {
   return (
     <section className="hidden border-t border-black/10 bg-background py-12 md:block">
       <div className="mx-auto max-w-7xl px-6">
@@ -20,9 +20,14 @@ export default function HomeOpeningAnnouncement() {
             </p>
           </div>
           <div className="shrink-0">
-            <Button href="/visit" className="bg-black text-white hover:bg-neutral-800 hover:opacity-100">
-              Get the details
-            </Button>
+          <Button
+  href="/visit"
+  variant="secondary"
+  className="border-black bg-transparent text-black hover:bg-black/5 hover:text-black"
+>
+  Call now
+</Button>
+
           </div>
         </div>
 

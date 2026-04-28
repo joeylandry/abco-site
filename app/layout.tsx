@@ -131,7 +131,7 @@ export default async function RootLayout({
         {!ageVerified ? <AgeGate /> : null}
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main id="main-content" className="flex-1 bg-white pt-[4.75rem] md:pt-0">
+          <main id="main-content" className="flex-1 bg-white pt-[4.75rem] md:pt-[4.75rem]">
             {children}
           </main>
           <Footer />

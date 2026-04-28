@@ -227,90 +227,100 @@ export async function getBeerFinderData(options: { maxCoordinateLookups?: number
     }
   }
 
-  const [drinks, customerTypes, orders] = await Promise.all([
-    fetchDrinks(),
-    fetchCustomerTypes(),
-    fetchRecentOrders(DEFAULT_LOOKBACK_DAYS),
-  ])
+  try {
+    const [drinks, customerTypes, orders] = await Promise.all([
+      fetchDrinks(),
+      fetchCustomerTypes(),
+      fetchRecentOrders(DEFAULT_LOOKBACK_DAYS),
+    ])
 
-  const activeDrinks = drinks
-    .filter((drink) => !drink.obsolete)
-    .sort((left, right) => normalizeText(right.name).length - normalizeText(left.name).length)
+    const activeDrinks = drinks
+      .filter((drink) => !drink.obsolete)
+      .sort((left, right) => normalizeText(right.name).length - normalizeText(left.name).length)
 
-  const customerTypeNames = new Map(customerTypes.map((customerType) => [customerType.id, customerType.type_name]))
-  const venueMap = new Map<number, BeerFinderLocation>()
+    const customerTypeNames = new Map(customerTypes.map((customerType) => [customerType.id, customerType.type_name]))
+    const venueMap = new Map<number, BeerFinderLocation>()
 
-  for (const order of orders) {
-    const customerType = order.customer.type ? customerTypeNames.get(order.customer.type) ?? null : null
+    for (const order of orders) {
+      const customerType = order.customer.type ? customerTypeNames.get(order.customer.type) ?? null : null
 
-    if (!isExternalCustomer(order.customer.name, customerType)) {
-      continue
-    }
-
-    const beerCounts = new Map<string, number>()
-
-    for (const line of order.order_lines) {
-      const drinkName = resolveDrinkName(line.product_name, activeDrinks)
-
-      if (!drinkName) {
+      if (!isExternalCustomer(order.customer.name, customerType)) {
         continue
       }
 
-      const quantity = line.quantity_dispatched || line.quantity || 0
-      beerCounts.set(drinkName, (beerCounts.get(drinkName) ?? 0) + quantity)
+      const beerCounts = new Map<string, number>()
+
+      for (const line of order.order_lines) {
+        const drinkName = resolveDrinkName(line.product_name, activeDrinks)
+
+        if (!drinkName) {
+          continue
+        }
+
+        const quantity = line.quantity_dispatched || line.quantity || 0
+        beerCounts.set(drinkName, (beerCounts.get(drinkName) ?? 0) + quantity)
+      }
+
+      if (beerCounts.size === 0) {
+        continue
+      }
+
+      const orderDate = getOrderDate(order)
+      const venue = venueMap.get(order.customer.id)
+      const address = resolveBestAddress(order.delivery_address, order.billing_address)
+
+      if (!venue) {
+        venueMap.set(order.customer.id, {
+          customerId: order.customer.id,
+          name: order.customer.name,
+          customerType,
+          address,
+          lastSeenDate: orderDate,
+          beers: Array.from(beerCounts.keys()).sort(),
+          totalUnits: Array.from(beerCounts.values()).reduce((sum, count) => sum + count, 0),
+          latitude: null,
+          longitude: null,
+        })
+        continue
+      }
+
+      if (new Date(orderDate) > new Date(venue.lastSeenDate)) {
+        venue.lastSeenDate = orderDate
+        venue.address = address ?? venue.address
+      }
+
+      venue.totalUnits += Array.from(beerCounts.values()).reduce((sum, count) => sum + count, 0)
+      venue.beers = Array.from(new Set([...venue.beers, ...beerCounts.keys()])).sort()
     }
 
-    if (beerCounts.size === 0) {
-      continue
+    const sortedLocations = Array.from(venueMap.values()).sort((left, right) => {
+      const dateComparison = new Date(right.lastSeenDate).getTime() - new Date(left.lastSeenDate).getTime()
+
+      if (dateComparison !== 0) {
+        return dateComparison
+      }
+
+      return left.name.localeCompare(right.name)
+    })
+
+    const locations = await hydrateBeerFinderLocations(sortedLocations, {
+      maxNewLookups: options.maxCoordinateLookups,
+    })
+
+    return {
+      status: "ready",
+      locations,
+      beerNames: Array.from(new Set(locations.flatMap((location) => location.beers))).sort(),
+      generatedAt: new Date().toISOString(),
+      lookbackDays: DEFAULT_LOOKBACK_DAYS,
     }
-
-    const orderDate = getOrderDate(order)
-    const venue = venueMap.get(order.customer.id)
-    const address = resolveBestAddress(order.delivery_address, order.billing_address)
-
-    if (!venue) {
-      venueMap.set(order.customer.id, {
-        customerId: order.customer.id,
-        name: order.customer.name,
-        customerType,
-        address,
-        lastSeenDate: orderDate,
-        beers: Array.from(beerCounts.keys()).sort(),
-        totalUnits: Array.from(beerCounts.values()).reduce((sum, count) => sum + count, 0),
-        latitude: null,
-        longitude: null,
-      })
-      continue
+  } catch {
+    return {
+      status: "ready",
+      locations: [],
+      beerNames: [],
+      generatedAt: new Date().toISOString(),
+      lookbackDays: DEFAULT_LOOKBACK_DAYS,
     }
-
-    if (new Date(orderDate) > new Date(venue.lastSeenDate)) {
-      venue.lastSeenDate = orderDate
-      venue.address = address ?? venue.address
-    }
-
-    venue.totalUnits += Array.from(beerCounts.values()).reduce((sum, count) => sum + count, 0)
-    venue.beers = Array.from(new Set([...venue.beers, ...beerCounts.keys()])).sort()
-  }
-
-  const sortedLocations = Array.from(venueMap.values()).sort((left, right) => {
-    const dateComparison = new Date(right.lastSeenDate).getTime() - new Date(left.lastSeenDate).getTime()
-
-    if (dateComparison !== 0) {
-      return dateComparison
-    }
-
-    return left.name.localeCompare(right.name)
-  })
-
-  const locations = await hydrateBeerFinderLocations(sortedLocations, {
-    maxNewLookups: options.maxCoordinateLookups,
-  })
-
-  return {
-    status: "ready",
-    locations,
-    beerNames: Array.from(new Set(locations.flatMap((location) => location.beers))).sort(),
-    generatedAt: new Date().toISOString(),
-    lookbackDays: DEFAULT_LOOKBACK_DAYS,
   }
 }

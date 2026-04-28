@@ -22,6 +22,9 @@ export function MobileEventWidget({
   interactive = false,
   ctaLabel = "Add to your calendar",
   ctaHref = getEventCalendarHref(event),
+  badgeCompact = false,
+  contentStretch = false,
+  dateCompact = false,
 }: {
   event: EventItem
   label: string
@@ -29,6 +32,9 @@ export function MobileEventWidget({
   interactive?: boolean
   ctaLabel?: string
   ctaHref?: string
+  badgeCompact?: boolean
+  contentStretch?: boolean
+  dateCompact?: boolean
 }) {
   const router = useRouter()
   const theme = getEventCardTheme(accentIndex)
@@ -70,35 +76,51 @@ export function MobileEventWidget({
 
       <div className="relative flex h-full flex-col p-3">
         <div className="mb-2.5 flex items-center justify-start gap-2">
-          <MobileEventBadge label={label} mutedTextColor={theme.accentMutedTextColor} />
+          <MobileEventBadge
+            label={label}
+            mutedTextColor={theme.accentMutedTextColor}
+            compact={badgeCompact}
+          />
         </div>
 
-        <div className="flex flex-col items-center gap-1.5 text-center">
+        <div className={`flex flex-col gap-1.5 ${contentStretch ? "items-start text-left" : "items-center text-center"}`}>
           <h3 className="w-full font-heading text-[clamp(1rem,4.2vw,1.28rem)] leading-[1.02] text-balance">
             {event.title}
           </h3>
         </div>
 
-        <div className="flex flex-1 items-center justify-center py-1">
-          <div className="flex flex-col items-center text-center gap-0.5">
+        <div className={`flex flex-1 items-center justify-center ${dateCompact ? "py-0.5" : "py-1"}`}>
+          <div className={`flex flex-col items-center text-center ${dateCompact ? "gap-[0.125rem]" : "gap-0.5"}`}>
             <p
-              className="font-heading text-[clamp(0.68rem,2.8vw,0.84rem)] leading-none uppercase tracking-[0.14em]"
+              className={`font-heading leading-none uppercase ${dateCompact ? "text-[clamp(0.56rem,2.2vw,0.7rem)] tracking-[0.12em]" : "text-[clamp(0.68rem,2.8vw,0.84rem)] tracking-[0.14em]"}`}
               style={{ color: theme.accentMutedTextColor }}
             >
               {event.weekday}
             </p>
-            <p className="font-heading text-[clamp(1.6rem,7vw,2.28rem)] leading-none uppercase tracking-[0.08em]">
+            <p
+              className={`font-heading leading-none uppercase ${
+                dateCompact
+                  ? "text-[clamp(1.35rem,5.8vw,1.9rem)] tracking-[0.06em]"
+                  : "text-[clamp(1.6rem,7vw,2.28rem)] tracking-[0.08em]"
+              }`}
+            >
               {event.month}
             </p>
-            <p className="font-heading text-[clamp(2.4rem,10.4vw,3.4rem)] leading-none">
+            <p
+              className={`font-heading leading-none ${
+                dateCompact ? "text-[clamp(2rem,8.7vw,2.9rem)]" : "text-[clamp(2.4rem,10.4vw,3.4rem)]"
+              }`}
+            >
               {event.day}
             </p>
           </div>
         </div>
 
-        <div className="mt-auto pt-2 text-center">
+        <div className={`mt-auto pt-2 ${contentStretch ? "text-left" : "text-center"}`}>
           <p
-            className="mb-2 w-full text-[0.8rem] leading-[1.4] text-balance sm:text-sm sm:leading-relaxed"
+            className={`mb-2 w-full text-[0.8rem] leading-[1.4] text-balance sm:text-sm sm:leading-relaxed ${
+              contentStretch ? "sm:max-w-none" : ""
+            }`}
             style={{ color: theme.accentMutedTextColor }}
           >
             {event.shortDescription}
@@ -187,11 +209,15 @@ export function MobileCalendarGridCard({
           </h3>
 
           {description ? (
-            <div className="mt-2 flex min-h-0 flex-1 items-start">
+            <div
+              className={`mt-2 flex min-h-0 flex-1 ${
+                expandDescription ? "items-center" : "items-start"
+              }`}
+            >
               <p
                 className={
                   expandDescription
-                    ? "w-full overflow-hidden text-center text-[0.8rem] leading-[1.5] text-balance sm:max-w-none"
+                    ? "mx-auto w-full max-w-[16.5rem] overflow-hidden text-center text-[0.86rem] leading-[1.65] text-balance"
                     : "w-full overflow-hidden text-center text-[0.68rem] leading-[1.35] text-balance [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]"
                 }
                 style={{ color: theme.accentMutedTextColor }}

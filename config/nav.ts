@@ -4,7 +4,7 @@ export const PRIMARY_NAV_ITEMS = [
   { href: "/beer", label: "Beers" },
   { href: "/events", label: "Events" },
   { href: "/contact", label: "Contact" },
-  { href: "/shop", label: "Shop" },
+  { href: "https://drinkarlingtonbeer.square.site", label: "Shop" },
 ];
 
 export const SECONDARY_NAV_ITEMS = [

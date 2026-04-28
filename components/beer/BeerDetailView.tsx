@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import BeerCard, { type Beer } from "@/components/beer/BeerCard"
@@ -7,6 +8,10 @@ import HomeMobileBeerTeaser from "@/components/home/HomeMobileBeerTeaser"
 import Button from "@/components/ui/Button"
 import { getBeerImageFrame, getBeerImageStyle } from "@/components/beer/beerImageFrame"
 import { getMobileBeerIconSrc } from "@/components/beer/mobileBeerArtwork"
+import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
+
+const CLEAR_EVENT_BUTTON_CLASS =
+  "border border-black bg-transparent text-black shadow-none hover:bg-black/5 hover:text-black"
 
 function formatPackaging(packaging: string[] | undefined) {
   if (!packaging?.length) {
@@ -22,33 +27,6 @@ function formatAvailability(availability: "yearRound" | "seasonal" | "rotating")
   return "Rotating"
 }
 
-function hexToRgb(hex: string) {
-  const normalized = hex.replace("#", "")
-
-  return {
-    r: Number.parseInt(normalized.slice(0, 2), 16),
-    g: Number.parseInt(normalized.slice(2, 4), 16),
-    b: Number.parseInt(normalized.slice(4, 6), 16),
-  }
-}
-
-function hexToRgba(hex: string, alpha: number) {
-  const { r, g, b } = hexToRgb(hex)
-
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
-}
-
-function mixHex(baseHex: string, targetHex: string, weight: number) {
-  const base = hexToRgb(baseHex)
-  const target = hexToRgb(targetHex)
-  const mixChannel = (baseChannel: number, targetChannel: number) =>
-    Math.round(baseChannel + (targetChannel - baseChannel) * weight)
-
-  return `#${[mixChannel(base.r, target.r), mixChannel(base.g, target.g), mixChannel(base.b, target.b)]
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("")}`
-}
-
 function getGalleryAspectRatio(imageSrc: string) {
   if (imageSrc.includes("horizontal")) {
     return "4 / 3"
@@ -61,17 +39,167 @@ function getGalleryAspectRatio(imageSrc: string) {
   return "3 / 4"
 }
 
-function getRelativeLuminance(hex: string) {
-  const { r, g, b } = hexToRgb(hex)
-  const toLinear = (channel: number) => {
-    const normalized = channel / 255
-    return normalized <= 0.03928
-      ? normalized / 12.92
-      : ((normalized + 0.055) / 1.055) ** 2.4
+function BackArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={className ?? "h-4 w-4 fill-none stroke-current stroke-[1.8]"}
+    >
+      <path d="M19 12H6" />
+      <path d="M11 6l-6 6 6 6" />
+    </svg>
+  )
+}
+
+function ForwardArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={className ?? "h-4 w-4 fill-none stroke-current stroke-[1.8]"}
+    >
+      <path d="M5 12h13" />
+      <path d="M13 6l6 6-6 6" />
+    </svg>
+  )
+}
+
+function GalleryArrowIcon({
+  direction,
+  className,
+}: {
+  direction: "left" | "right"
+  className?: string
+}) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={className ?? "h-4 w-4 fill-none stroke-current stroke-[1.8]"}
+    >
+      {direction === "left" ? (
+        <>
+          <path d="M19 12H6" />
+          <path d="M11 6l-6 6 6 6" />
+        </>
+      ) : (
+        <>
+          <path d="M5 12h13" />
+          <path d="M13 6l6 6-6 6" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+function DesktopRotatingGallery({
+  images,
+  beerId,
+  beerName,
+}: {
+  images: string[]
+  beerId: string
+  beerName: string
+}) {
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  useEffect(() => {
+    if (images.length < 2) {
+      return
+    }
+
+    const interval = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % images.length)
+    }, 4200)
+
+    return () => window.clearInterval(interval)
+  }, [images.length])
+
+  useEffect(() => {
+    if (activeIndex >= images.length) {
+      setActiveIndex(0)
+    }
+  }, [activeIndex, images.length])
+
+  if (!images.length) {
+    return null
   }
 
-  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b)
+  return (
+    <div className="relative aspect-[5/6] min-h-[30rem] w-full overflow-hidden border border-black/10 bg-white shadow-sm">
+      <div className="absolute inset-0">
+        {images.map((imageSrc, index) => (
+          <div
+            key={`${beerName}-${imageSrc}-${index}`}
+            className={`absolute inset-0 transition-all duration-700 ease-out ${
+              index === activeIndex ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-[1.02]"
+            }`}
+          >
+            <Image
+              src={imageSrc}
+              alt={`${beerName} gallery image ${index + 1}`}
+              fill
+              className="object-cover will-change-transform"
+              style={getBeerImageStyle(getBeerImageFrame(imageSrc, beerId))}
+              sizes="(max-width: 1024px) 50vw, 50vw"
+              priority={index === 0}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.06),transparent_34%,transparent_72%,rgba(15,23,42,0.26))]" />
+
+      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-4 px-4 py-4 text-white">
+        <div className="rounded-full bg-black/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] backdrop-blur-sm">
+          Gallery {String(activeIndex + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {images.map((_, index) => (
+            <button
+              key={`${beerName}-dot-${index}`}
+              type="button"
+              onClick={() => setActiveIndex(index)}
+              aria-label={`Show gallery image ${index + 1}`}
+              aria-pressed={index === activeIndex}
+              className={`h-2.5 rounded-full transition-all duration-200 ${
+                index === activeIndex ? "w-8 bg-white" : "w-2.5 bg-white/45 hover:bg-white/70"
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center gap-1.5 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => setActiveIndex((current) => (current - 1 + images.length) % images.length)}
+            aria-label="Previous gallery image"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-white transition hover:bg-white/10"
+          >
+            <GalleryArrowIcon direction="left" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveIndex((current) => (current + 1) % images.length)}
+            aria-label="Next gallery image"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-white transition hover:bg-white/10"
+          >
+            <GalleryArrowIcon direction="right" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
+
+const WHITE_BACKGROUND = "#FFFFFF"
+const BLACK_TEXT = "#161616"
+const MUTED_BLACK_TEXT = "rgba(22, 22, 22, 0.58)"
+const BODY_BLACK_TEXT = "rgba(22, 22, 22, 0.84)"
+const SURFACE_BLACK = "rgba(22, 22, 22, 0.04)"
+const SURFACE_BORDER_BLACK = "rgba(22, 22, 22, 0.12)"
 
 type BeerDetailViewProps = {
   beer: Beer
@@ -87,26 +215,19 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
   const mobileGalleryImages = uniqueDetailImages
   const mobileCanSrc = getMobileBeerIconSrc(beer.id)
 
-  const accentColor = beer.cardColor
-  const mobileDetailBackgroundColor = mixHex(accentColor, "#FFFFFF", 0.82)
-  const buttonTextColor = getRelativeLuminance(mobileDetailBackgroundColor) < 0.45 ? "#FFFFFF" : "#161616"
-  const mobileMutedTextColor = hexToRgba(buttonTextColor, 0.58)
-  const mobileBodyTextColor = hexToRgba(buttonTextColor, 0.84)
-  const mobileSurfaceColor = hexToRgba(buttonTextColor, 0.04)
-  const mobileSurfaceBorderColor = hexToRgba(buttonTextColor, 0.12)
+  const buttonTextColor = BLACK_TEXT
+  const mobileMutedTextColor = MUTED_BLACK_TEXT
+  const mobileBodyTextColor = BODY_BLACK_TEXT
+  const mobileSurfaceColor = SURFACE_BLACK
+  const mobileSurfaceBorderColor = SURFACE_BORDER_BLACK
+  const desktopGalleryImages = uniqueDetailImages
   const beerSpecs = [beer.abv > 0 ? `${beer.abv}% ABV` : null, beer.ibu ? `${beer.ibu} IBU` : null]
     .filter((value): value is string => value !== null)
     .join(" | ")
 
-  const heroBackdrop = [
-    `radial-gradient(circle at top left, ${hexToRgba(accentColor, 0.28)} 0%, transparent 34%)`,
-    `radial-gradient(circle at bottom right, ${hexToRgba(accentColor, 0.22)} 0%, transparent 36%)`,
-    `linear-gradient(180deg, ${hexToRgba(accentColor, 0.1)} 0%, transparent 42%)`,
-  ].join(", ")
-
   return (
-    <div className="bg-background">
-      <section className="relative overflow-hidden md:hidden" style={{ backgroundColor: mobileDetailBackgroundColor }}>
+    <div className="bg-white">
+      <section className="relative overflow-hidden md:hidden" style={{ backgroundColor: WHITE_BACKGROUND }}>
         <div className="relative mx-auto max-w-3xl px-4 py-4" style={{ color: buttonTextColor }}>
           <div className="space-y-5">
             <div className="grid grid-cols-[minmax(0,1fr)_clamp(128px,32vw,180px)] items-start gap-x-4 gap-y-3">
@@ -144,9 +265,10 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
               <div className="mt-4 flex justify-center">
                 <Button
                   href={`/beer-finder?beer=${encodeURIComponent(beer.id)}`}
-                  className="border border-black/30 bg-transparent text-black shadow-none hover:bg-transparent hover:text-black hover:opacity-100 hover:shadow-none"
+                  variant="secondary"
+                  className={`px-5 py-2.5 text-xs sm:text-sm ${CLEAR_EVENT_BUTTON_CLASS}`}
                 >
-                  FIND THIS BEER
+                  Find this beer
                 </Button>
               </div>
             </div>
@@ -179,53 +301,27 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
         </div>
       </section>
 
-      <HomeMobileBeerTeaser variant="related" backgroundColor={mobileDetailBackgroundColor} />
+      <HomeMobileBeerTeaser variant="related" backgroundColor={WHITE_BACKGROUND} />
 
       <section className="relative hidden overflow-hidden md:block">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundImage: heroBackdrop }}
-        />
-
         <div className="relative mx-auto max-w-6xl px-6 py-8 lg:py-10">
           <div className="mb-4">
             <Link
               href="/beer"
-              className="inline-flex items-center gap-2 text-base font-semibold text-black/70 transition hover:text-black"
+              className="inline-flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.2em] text-black/80 transition hover:text-black"
             >
-              <span aria-hidden="true">&larr;</span>
-              Back to beer
+              <BackArrowIcon />
+              <span>BACK TO BEERS</span>
             </Link>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)] lg:items-stretch lg:gap-8">
-            <div className="flex h-full flex-col">
-              <div className="grid gap-3 sm:grid-cols-2 sm:grid-rows-2 lg:h-full">
-                {detailImages.slice(0, 3).map((imageSrc, index) => (
-                  <div
-                    key={`${beer.id}-${imageSrc}-${index}`}
-                    className={`relative overflow-hidden border border-black/10 bg-white shadow-sm ${
-                      index === 0
-                        ? "min-h-[280px] sm:row-span-2 lg:h-full lg:min-h-0"
-                        : "min-h-[165px] lg:min-h-0"
-                    }`}
-                  >
-                    <Image
-                      src={imageSrc}
-                      alt={`${beer.name} gallery image ${index + 1}`}
-                      fill
-                      className="object-cover will-change-transform"
-                      style={getBeerImageStyle(getBeerImageFrame(imageSrc, beer.id))}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      priority={index === 0}
-                    />
-                  </div>
-                ))}
-              </div>
+            <div className="flex h-full">
+              <DesktopRotatingGallery images={desktopGalleryImages} beerId={beer.id} beerName={beer.name} />
             </div>
 
-            <div className="flex h-full flex-col border border-black/10 bg-surface p-6 shadow-sm lg:p-7">
-              <div className="flex w-full flex-1 flex-col">
+            <div className="flex h-full flex-col border border-black/10 bg-white p-6 shadow-sm lg:p-7">
+              <div className="flex h-full w-full flex-col">
                 <h1 className="mt-3 text-center font-heading text-3xl leading-none md:text-4xl">
                   {beer.name}
                 </h1>
@@ -272,16 +368,13 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
                 </dl>
 
                 <div className="mt-auto flex justify-center pt-5">
-                  <Link
+                  <Button
                     href={`/beer-finder?beer=${encodeURIComponent(beer.id)}`}
-                    className="inline-flex items-center justify-center rounded-full px-7 py-3.5 text-sm font-semibold tracking-wide shadow-lg shadow-black/20 transition-all duration-200 hover:-translate-y-0.5 hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground/80"
-                    style={{
-                      backgroundColor: accentColor,
-                      color: buttonTextColor,
-                    }}
+                    variant="secondary"
+                    className={`px-5 py-2.5 text-xs sm:text-sm ${CLEAR_EVENT_BUTTON_CLASS}`}
                   >
                     Find this beer
-                  </Link>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -289,19 +382,20 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
         </div>
       </section>
 
-      <section className="hidden border-t border-black/10 bg-white/50 py-12 md:block">
+      <section className="hidden border-t border-black/10 bg-white py-12 md:block">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-                More To Explore
-              </p>
-              <h2 className="mt-2 font-heading text-xl leading-tight md:text-2xl">
-                you may also like...
+              <h2 className={DESKTOP_EVENT_SECTION_HEADING_CLASS}>
+                As You May Also Like...
               </h2>
             </div>
-            <Link href="/beer" className="text-sm font-semibold text-black/70 transition hover:text-black">
-              View all beers
+            <Link
+              href="/beer"
+              className="inline-flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.2em] text-black/80 transition hover:text-black"
+            >
+              <span>VIEW ALL BEERS</span>
+              <ForwardArrowIcon />
             </Link>
           </div>
 

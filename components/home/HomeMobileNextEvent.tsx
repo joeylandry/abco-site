@@ -16,6 +16,8 @@ export default function HomeMobileNextEvent() {
           label="Next Event"
           accentIndex={0}
           interactive
+          contentStretch
+          dateCompact
         />
       </div>
     </section>

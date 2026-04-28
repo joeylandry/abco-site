@@ -3,12 +3,12 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Button from "@/components/ui/Button"
-import EventPreviewCard from "@/components/events/EventPreviewCard"
 import { CalendarIcon } from "@/components/events/mobile/MobileEventShared"
 import {
   MobileCalendarGridCard,
 } from "@/components/events/mobile/MobileEventWidgets"
 import AllUpcomingEventsDrawer from "@/components/events/mobile/AllUpcomingEventsDrawer"
+import DesktopUpcomingEventsSection from "@/components/events/DesktopUpcomingEventsSection"
 import MobileEventLocationLink from "@/components/events/mobile/MobileEventLocationLink"
 import {
   getEventById,
@@ -19,7 +19,8 @@ import { buildEventCalendarFilename } from "@/lib/eventCalendar"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
 import { truncateToEvenLength } from "@/lib/truncateToEvenLength"
 
-const BUY_TICKETS_BUTTON_CLASS = "bg-black text-white hover:bg-neutral-800 hover:opacity-100"
+const BUY_TICKETS_DESKTOP_BUTTON_CLASS =
+  "px-5 py-2.5 text-xs sm:text-sm border border-black bg-transparent text-black shadow-none hover:bg-black/5 hover:text-black"
 
 function hexToRgb(hex: string) {
   const normalized = hex.replace("#", "")
@@ -101,6 +102,19 @@ export async function generateMetadata({
     title: event.title,
     description: event.shortDescription,
   }
+}
+
+function BackArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={className ?? "h-4 w-4 fill-none stroke-current stroke-[1.8]"}
+    >
+      <path d="M19 12H6" />
+      <path d="M11 6l-6 6 6 6" />
+    </svg>
+  )
 }
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
@@ -257,13 +271,13 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,164,137,0.22),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(116,195,213,0.14),transparent_30%)]" />
 
         <div className="relative mx-auto max-w-6xl px-6 py-8 lg:py-10">
-          <div className="mb-4">
+        <div className="mb-4">
             <Link
               href="/events"
-              className="inline-flex items-center gap-2 text-base font-semibold text-black/70 transition hover:text-black"
+              className="inline-flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.2em] text-black/80 transition hover:text-black"
             >
-              <span aria-hidden="true">&larr;</span>
-              Back to events
+              <BackArrowIcon />
+              <span>BACK TO EVENTS</span>
             </Link>
           </div>
 
@@ -353,27 +367,26 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                   {event.ticketHref && event.status === "upcoming" ? (
                     <Button
                       href={event.ticketHref}
-                      className={BUY_TICKETS_BUTTON_CLASS}
+                      variant="secondary"
+                      className={BUY_TICKETS_DESKTOP_BUTTON_CLASS}
                     >
                       Buy tickets
                     </Button>
                   ) : null}
-                  <Button
-                    href="/events"
-                    variant="secondary"
-                    className="border-black text-black hover:bg-black hover:text-white"
-                  >
-                    View all events
-                  </Button>
                 </div>
               </div>
             </div>
           </div>
+
+          <DesktopUpcomingEventsSection
+            className="mt-8"
+            events={relatedUpcomingEvents}
+          />
         </div>
       </section>
 
       <section
-        id="more-events"
+        id="mobile-more-events"
         className="py-4 md:hidden"
         style={{ backgroundColor: mobileDetailBackgroundColor }}
       >
@@ -406,29 +419,6 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         </div>
       </section>
 
-      <section className="hidden border-t border-black/10 bg-white/50 py-12 md:block">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-                More To Explore
-              </p>
-              <h2 className="mt-2 font-heading text-3xl leading-tight">Upcoming Events</h2>
-            </div>
-            <Link href="/events" className="text-sm font-semibold text-black/70 transition hover:text-black">
-              View all events
-            </Link>
-          </div>
-
-          <div className="flex gap-6 overflow-x-auto pb-4">
-            {relatedUpcomingEvents.map((relatedEvent, index) => (
-              <div key={relatedEvent.id} className="min-w-[280px] max-w-[280px] flex-none">
-                <EventPreviewCard event={relatedEvent} accentIndex={index} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

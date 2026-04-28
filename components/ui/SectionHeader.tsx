@@ -2,6 +2,7 @@ import Image from "next/image"
 
 type SectionHeaderProps = {
   title: string
+  mobileTitle?: string
   eyebrow?: string
   showBottomBorder?: boolean
   titleClassName?: string
@@ -47,6 +48,7 @@ const variantImagePosition = {
 
 export default function SectionHeader({
   title,
+  mobileTitle,
   eyebrow,
   showBottomBorder = true,
   titleClassName,
@@ -79,11 +81,18 @@ export default function SectionHeader({
         )}
 
         <h1
-          className={`mt-1 font-heading text-[clamp(4.2rem,22vw,6.75rem)] uppercase leading-[0.8] tracking-[-0.1em] text-black md:text-5xl md:font-semibold md:normal-case md:leading-tight md:tracking-wide ${
+          className={`mt-1 font-heading text-[clamp(4.2rem,22vw,6.75rem)] leading-[0.8] tracking-[-0.1em] text-black ${
             titleClassName ?? ""
           }`}
         >
-          {title}
+          {mobileTitle ? (
+            <>
+              <span className="md:hidden">{mobileTitle}</span>
+              <span className="hidden md:inline">{title}</span>
+            </>
+          ) : (
+            title
+          )}
         </h1>
       </div>
     </section>

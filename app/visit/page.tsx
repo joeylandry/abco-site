@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import BreweryLocationWidget from "@/components/location/BreweryLocationWidget"
 import VisitHeader from "@/components/page-headers/VisitHeader"
+import VisitAnnoucment from "@/components/home/VisitAnnoucment"
+import VisitMobileAnnoucment from "@/components/home/VisitMobileAnnoucment"
 
 export const metadata: Metadata = {
   title: "Visit",
@@ -11,6 +13,8 @@ export default function VisitPage() {
   return (
     <>
       <VisitHeader />
+      <VisitAnnoucment />
+      <VisitMobileAnnoucment />
 
       <main className="bg-background">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-10 sm:py-14 md:items-start md:grid-cols-[minmax(0,1.15fr)_minmax(320px,360px)]">

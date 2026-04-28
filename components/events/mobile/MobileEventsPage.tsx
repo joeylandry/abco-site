@@ -19,6 +19,7 @@ export default function MobileEventsPage() {
                 label={index === 0 ? "Next Event" : "Upcoming Event"}
                 accentIndex={index}
                 interactive
+                badgeCompact
               />
             ))}
           </div>

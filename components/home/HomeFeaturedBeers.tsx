@@ -1,7 +1,8 @@
 import Image from "next/image"
 import Link from "next/link"
 import BeerCard from "@/components/beer/BeerCard"
-import BeerFinderBeerSearch from "@/components/home/BeerFinderBeerSearch"
+import HomeDesktopBeerFinderSearch from "@/components/home/HomeDesktopBeerFinderSearch"
+import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
 import { getBeerById, mockBeers } from "@/app/beer/mockBeers"
 import { getBeerFinderData } from "@/lib/breww"
 
@@ -73,6 +74,19 @@ function formatNearbyLocationsLabel(locationCount: number | null) {
   return "No recent matches"
 }
 
+function ForwardArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={className ?? "h-4 w-4 fill-none stroke-current stroke-[1.8]"}
+    >
+      <path d="M5 12h13" />
+      <path d="M13 6l6 6-6 6" />
+    </svg>
+  )
+}
+
 export default async function HomeFeaturedBeers() {
   const featuredBeers = featuredBeerIds
     .map((id) => getBeerById(id))
@@ -82,22 +96,19 @@ export default async function HomeFeaturedBeers() {
     return null
   }
 
-  const beerSearchOptions = mockBeers
-    .map((beer) => ({ id: beer.id, name: beer.name }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
+  const beerFinderCarouselBeers = mockBeers.filter((beer) => Boolean(beer.image.primarySrc))
   const beerFinderData = await getBeerFinderData({ maxCoordinateLookups: 0 })
   const hasBeerFinderData = beerFinderData.status === "ready"
 
-  const featuredBeerFinderSummaries: Array<{
-    beer: (typeof featuredBeers)[number]
+  const beerFinderCarouselSummaries: Array<{
+    beer: (typeof beerFinderCarouselBeers)[number]
     locationCount: number | null
-  }> = featuredBeers.map((beer) => ({ beer, locationCount: null }))
+  }> = beerFinderCarouselBeers.map((beer) => ({ beer, locationCount: null }))
 
   if (hasBeerFinderData) {
     const locations = beerFinderData.locations
 
-    for (const summary of featuredBeerFinderSummaries) {
+    for (const summary of beerFinderCarouselSummaries) {
       const normalizedBeerName = normalizeText(summary.beer.name)
       summary.locationCount = locations.reduce((total, location) => {
         if (location.beers.some((locationBeer) => normalizeText(locationBeer) === normalizedBeerName)) {
@@ -109,126 +120,99 @@ export default async function HomeFeaturedBeers() {
     }
   }
 
-  const featuredBeerFinderMatches = featuredBeerFinderSummaries.filter((summary) =>
-    typeof summary.locationCount === "number" ? summary.locationCount > 0 : false
-  )
-  const featuredBeerFinderCarouselMatches = featuredBeerFinderMatches.slice(0, 4)
+  const beerFinderCarouselItems = beerFinderCarouselSummaries
 
   return (
-    <section className="hidden border-t border-black/10 bg-background py-12 md:block">
+    <section className="hidden border-y border-black/10 bg-background py-12 md:block">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="rounded-[24px] border border-black/10 bg-surface p-6 shadow-sm sm:p-8">
-          <div className="flex flex-col gap-6 md:grid md:grid-cols-[minmax(0,440px)_minmax(0,1fr)] md:gap-10 md:items-start">
-            <div className="max-w-xl md:max-w-none">
-              <div className="flex flex-wrap items-center gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/55">Beer Finder</p>
-                <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-900">
-                  <span className="relative mr-2 flex h-2 w-2" aria-hidden="true">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-50" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                  </span>
-                  Now live
-                </span>
-              </div>
-              <h3 className="mt-2 font-heading text-2xl leading-tight">Find these beers near you</h3>
-              <p className="mt-3 text-sm leading-relaxed text-black/70">
-                Start with featured picks or choose any beer from the lineup, then we&apos;ll show where it&apos;s pouring.
-                {" "}
-                <span className="ml-2">
-                  <Link
-                    href="/beer-finder"
-                    className="inline-flex items-center gap-1 font-semibold text-black/80 transition hover:text-black"
-                  >
-                    Open Beer Finder <span aria-hidden="true">→</span>
-                  </Link>
-                </span>
-              </p>
-
-              <BeerFinderBeerSearch beers={beerSearchOptions} className="mt-5 max-w-xl" />
-            </div>
-
+        <h2 className="mb-6 mx-auto w-fit whitespace-nowrap text-center font-heading text-[clamp(4.25rem,7vw,7.5rem)] leading-[0.8] tracking-[-0.1em] text-black">
+          Find Our Beer
+        </h2>
+        <div>
+          <div className="flex flex-col gap-10">
             <div className="min-w-0">
               <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-6 md:pb-2">
-                {featuredBeerFinderCarouselMatches.length > 0 ? (
-                  <>
-                    {featuredBeerFinderCarouselMatches.map(({ beer, locationCount }) => {
-                      const buttonTextColor = getReadableTextColor(beer.cardColor)
+                {beerFinderCarouselItems.map(({ beer, locationCount }) => {
+                  const buttonTextColor = getReadableTextColor(beer.cardColor)
+                  const isMockMatch = locationCount === null
 
-                      return (
-                        <div
-                          key={beer.id}
-                          className="min-w-[170px] max-w-[170px] flex-none snap-start"
-                        >
-                          <div className="overflow-hidden rounded-[22px] border border-black/10 bg-white shadow-sm">
-                            <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/[0.03]">
-                              <Image
-                                src={beer.image.primarySrc}
-                                alt={beer.image.alt}
-                                fill
-                                className="object-cover"
-                                sizes="170px"
-                              />
-                            </div>
-                          </div>
+                  return (
+                    <div key={beer.id} className="min-w-[200px] max-w-[200px] flex-none snap-start">
+                      <div className="overflow-hidden rounded-[22px] border border-black/10 bg-white shadow-sm">
+                        <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/[0.03]">
+                          <Image
+                            src={beer.image.primarySrc}
+                            alt={beer.image.alt}
+                            fill
+                            className="object-cover"
+                            sizes="200px"
+                          />
+                        </div>
+                      </div>
 
-                          <div className="relative -mt-6 px-3">
-                            <div className="rounded-[18px] border border-black/10 bg-white/90 px-3 py-3 text-center shadow-sm backdrop-blur">
-                              <p className="truncate text-sm font-semibold text-black">{beer.name}</p>
-                              <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-black/50">
-                                {formatNearbyLocationsLabel(locationCount)}
-                              </p>
-                              <div className="mt-2.5 flex justify-center">
-                                <Link
-                                  href={`/beer-finder?beer=${encodeURIComponent(beer.id)}`}
-                                  className="inline-flex items-center justify-center rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] shadow-sm transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-black/10"
-                                  style={{
-                                    backgroundColor: beer.cardColor,
-                                    color: buttonTextColor,
-                                  }}
-                                >
-                                  FIND BEER
-                                </Link>
-                              </div>
-                            </div>
+                      <div className="relative -mt-6 px-3">
+                        <div className="rounded-[18px] border border-black/10 bg-white/90 px-3 py-3 text-center shadow-sm backdrop-blur">
+                          <p className="truncate text-sm font-semibold text-black">{beer.name}</p>
+                          <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-black/50">
+                            {isMockMatch
+                              ? "Mock availability"
+                              : formatNearbyLocationsLabel(locationCount)}
+                          </p>
+                          <div className="mt-2.5 flex justify-center">
+                            <Link
+                              href={`/beer-finder?beer=${encodeURIComponent(beer.id)}`}
+                              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] shadow-sm transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-black/10"
+                              style={{
+                                backgroundColor: beer.cardColor,
+                                color: buttonTextColor,
+                              }}
+                            >
+                              FIND BEER
+                            </Link>
                           </div>
                         </div>
-                      )
-                    })}
-
-                    <div className="min-w-[170px] max-w-[170px] flex-none snap-start">
-                      <Link
-                        href="/beer-finder"
-                        className="flex aspect-[3/4] items-center justify-center px-5 text-center text-sm font-semibold text-black/65 transition hover:text-black focus:outline-none focus:ring-2 focus:ring-black/10"
-                        aria-label="Find all beers in Beer Finder"
-                      >
-                        <span className="inline-flex items-center gap-2">
-                          Find all beers <span aria-hidden="true">→</span>
-                        </span>
-                      </Link>
+                      </div>
                     </div>
-                  </>
-                ) : (
-                  <div className="flex min-w-[280px] flex-1 items-center justify-center rounded-[22px] border border-dashed border-black/15 bg-black/[0.02] px-6 py-10 text-center">
-                    <p className="text-sm font-semibold text-black/65">
-                      No featured beers have nearby matches right now. Try selecting a beer below.
-                    </p>
-                  </div>
-                )}
+                  )
+                })}
+
+                <div className="min-w-[200px] max-w-[200px] flex-none snap-start">
+                  <Link
+              href="/beer-finder"
+              className="flex aspect-[3/4] items-center justify-center px-5 text-center text-[0.76rem] font-semibold uppercase tracking-[0.2em] text-black/80 transition hover:text-black focus:outline-none focus:ring-2 focus:ring-black/10"
+            >
+              <span className="inline-flex items-center gap-2"></span>
+              <span>VIEW ALL BEERS</span>
+              <ForwardArrowIcon />
+            </Link>
+                </div>
+              </div>
+              <div className="mt-2 flex justify-end pr-1">
+                <p className="text-right text-xs font-semibold uppercase tracking-[0.22em] text-black/45">
+                  Scroll right for more
+                </p>
               </div>
             </div>
-          </div>
 
+            <div className="mx-auto min-w-0 w-full">
+              <h2 className={`mb-4 text-center ${DESKTOP_EVENT_SECTION_HEADING_CLASS}`}>
+                Or Enter Zip Code
+              </h2>
+              <HomeDesktopBeerFinderSearch />
+            </div>
+          </div>
         </div>
 
         <div className="mt-10 flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">
-              Featured Beers
-            </p>
-            <h2 className="mt-2 font-heading text-3xl leading-tight">Fresh From The Lineup</h2>
+            <h2 className={`mt-2 ${DESKTOP_EVENT_SECTION_HEADING_CLASS}`}>Featured Beers</h2>
           </div>
-          <Link href="/beer" className="text-sm font-semibold text-black/70 transition hover:text-black">
-            View all beers
+          <Link
+            href="/beer"
+            className="inline-flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.2em] text-black/80 transition hover:text-black"
+          >
+            <span>VIEW ALL BEERS</span>
+            <ForwardArrowIcon />
           </Link>
         </div>
 

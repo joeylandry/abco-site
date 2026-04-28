@@ -17,9 +17,7 @@ export default function HomeHeroBRotating() {
           alt="ABCo hero"
           fill
           priority
-          className={`object-cover transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${
-            incomingIndex !== null && incomingVisible ? "opacity-0 scale-[0.97]" : "opacity-100 scale-100"
-          }`}
+          className="object-cover opacity-100 scale-100"
         />
 
         {incomingIndex !== null ? (

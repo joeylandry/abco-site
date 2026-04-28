@@ -5,9 +5,11 @@ import { getEventCardTheme } from "@/lib/eventCardTheme"
 export default function EventPreviewCard({
   event,
   accentIndex = 0,
+  showDescription = true,
 }: {
   event: EventItem
   accentIndex?: number
+  showDescription?: boolean
 }) {
   const theme = getEventCardTheme(accentIndex)
 
@@ -38,13 +40,19 @@ export default function EventPreviewCard({
           <p className="font-heading text-4xl leading-none sm:text-5xl">{event.day}</p>
         </div>
 
-        <div className="flex flex-1 flex-col items-center bg-white px-5 py-4 text-center">
+        <div
+          className={`flex flex-1 flex-col items-center bg-white px-5 py-4 text-center ${
+            showDescription ? "" : "justify-center"
+          }`}
+        >
           <h3 className="font-heading text-2xl leading-tight">
             {event.title}
           </h3>
-          <p className="mt-2 max-w-[32rem] text-sm leading-snug text-black/75">
-            {event.shortDescription}
-          </p>
+          {showDescription ? (
+            <p className="mt-2 max-w-[32rem] text-sm leading-snug text-black/75">
+              {event.shortDescription}
+            </p>
+          ) : null}
         </div>
       </article>
     </Link>

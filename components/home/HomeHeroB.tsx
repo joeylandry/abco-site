@@ -3,23 +3,14 @@
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { useCrossfadeCarousel } from "@/components/home/useCrossfadeCarousel";
+import { getHomeHeroImageClass } from "@/lib/homeHeroImageStyles";
 
-const desktopHeroImages = [
-  "/homeHero/2025.08.30_ABCBeerGarden-0026.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0005.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0133.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0174.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0253.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0309.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0387.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0483.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0608.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0672.jpg",
-  "/homeHero/2025.08.30_ABCBeerGarden-0687.jpg",
-];
+type HomeHeroBProps = {
+  images: string[];
+};
 
-export default function HomeHeroB() {
-  const { activeIndex, incomingIndex, incomingVisible } = useCrossfadeCarousel(desktopHeroImages, {
+export default function HomeHeroB({ images }: HomeHeroBProps) {
+  const { activeIndex, incomingIndex, incomingVisible } = useCrossfadeCarousel(images, {
     intervalMs: 10000,
     fadeMs: 1200,
   });
@@ -28,21 +19,23 @@ export default function HomeHeroB() {
     <section className="relative min-h-[calc(100vh-72px)] w-full overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src={desktopHeroImages[activeIndex]}
+          src={images[activeIndex]}
           alt="ABCo hero background"
           fill
           priority
           sizes="100vw"
-          className="object-cover brightness-110 contrast-105 opacity-100"
+          className={`object-cover opacity-100 ${getHomeHeroImageClass(images[activeIndex])}`}
         />
 
         {incomingIndex !== null ? (
           <Image
-            src={desktopHeroImages[incomingIndex]}
+            src={images[incomingIndex]}
             alt="ABCo hero background"
             fill
             sizes="100vw"
-            className={`transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none object-cover brightness-110 contrast-105 ${
+            className={`object-cover transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none ${getHomeHeroImageClass(
+              images[incomingIndex]
+            )} ${
               incomingVisible ? "opacity-100" : "opacity-0"
             }`}
           />

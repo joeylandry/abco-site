@@ -21,6 +21,7 @@ export const navItem = defineType({
       name: 'sortOrder',
       title: 'Sort Order',
       type: 'number',
+      description: 'Controls the order this item appears on the site. Lower numbers appear first.',
       initialValue: 0,
     }),
     defineField({

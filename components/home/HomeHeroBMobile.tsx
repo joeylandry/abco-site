@@ -3,27 +3,14 @@
 import Image from "next/image";
 import { useCrossfadeCarousel } from "@/components/home/useCrossfadeCarousel";
 import Button from "@/components/ui/Button";
+import { getHomeHeroImageClass } from "@/lib/homeHeroImageStyles";
 
-const mobileHeroImages = [
-  "/homeHero/mobile/1.jpg",
-  "/homeHero/mobile/2.jpg",
-  "/homeHero/mobile/3.jpg",
-  "/homeHero/mobile/4.jpg",
-  "/homeHero/mobile/5.jpg",
-  "/homeHero/mobile/6.jpg",
-  "/homeHero/mobile/7.jpg",
-  "/homeHero/mobile/8.jpg",
-  "/homeHero/mobile/9.jpg",
-];
+type HomeHeroBMobileProps = {
+  images: string[];
+};
 
-function getMobileHeroImageClass(index: number) {
-  const position = index === 8 ? "object-[68%_center]" : "object-center";
-
-  return `object-cover ${position}`;
-}
-
-export default function HomeHeroBMobile() {
-  const { activeIndex, incomingIndex, incomingVisible } = useCrossfadeCarousel(mobileHeroImages, {
+export default function HomeHeroBMobile({ images }: HomeHeroBMobileProps) {
+  const { activeIndex, incomingIndex, incomingVisible } = useCrossfadeCarousel(images, {
     intervalMs: 10000,
     fadeMs: 1200,
   });
@@ -33,23 +20,25 @@ export default function HomeHeroBMobile() {
       <div className="relative h-[74svh] min-h-[520px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src={mobileHeroImages[activeIndex]}
+            src={images[activeIndex]}
             alt="ABCo hero background"
             fill
             priority
             sizes="100vw"
-            className={`opacity-100 ${getMobileHeroImageClass(activeIndex)}`}
+            className={`object-cover opacity-100 ${getHomeHeroImageClass(images[activeIndex])}`}
           />
 
           {incomingIndex !== null ? (
             <Image
-              src={mobileHeroImages[incomingIndex]}
+              src={images[incomingIndex]}
               alt="ABCo hero background"
               fill
               sizes="100vw"
-              className={`transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none ${getMobileHeroImageClass(
-                incomingIndex
-              )} ${incomingVisible ? "opacity-100" : "opacity-0"}`}
+              className={`object-cover transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none ${getHomeHeroImageClass(
+                images[incomingIndex]
+              )} ${
+                incomingVisible ? "opacity-100" : "opacity-0"
+              }`}
             />
           ) : null}
         </div>

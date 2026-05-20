@@ -2,18 +2,19 @@
 
 import { createPortal } from "react-dom"
 import { useEffect, useMemo, useRef, useState } from "react"
-import type { BeerAvailability } from "@/components/beer/BeerCard"
+import type { Beer } from "@/components/beer/BeerCard"
 import MobileBeerCard from "@/components/beer/MobileBeerCard"
-import { getBeerAttributeOptions, mockBeers } from "@/app/beer/mockBeers"
+import { beerMatchesFilterSelections } from "@/app/beer/mockBeers"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
 import MobileDrawerHeader from "@/components/layout/MobileDrawerHeader"
-
-const availabilityOptions: Array<{ value: "all" | BeerAvailability; label: string }> = [
-  { value: "all", label: "All beers" },
-  { value: "yearRound", label: "Year round" },
-  { value: "seasonal", label: "Seasonal" },
-  { value: "rotating", label: "Rotating" },
-]
+import {
+  beerFilterGroups,
+  countBeerFilterSelections,
+  createEmptyBeerFilterSelections,
+  toggleBeerFilterSelection,
+  type BeerFilterGroupKey,
+  type BeerFilterSelections,
+} from "@/studio/schemaTypes/shared/beerAttributes"
 
 function FilterIcon() {
   return (
@@ -34,9 +35,14 @@ function FilterIcon() {
   )
 }
 
-export default function MobileBeerCatalog() {
-  const [availability, setAvailability] = useState<"all" | BeerAvailability>("all")
-  const [selectedTag, setSelectedTag] = useState("all")
+type MobileBeerCatalogProps = {
+  beers: Beer[]
+}
+
+export default function MobileBeerCatalog({ beers }: MobileBeerCatalogProps) {
+  const [selectedFilters, setSelectedFilters] = useState<BeerFilterSelections>(
+    createEmptyBeerFilterSelections,
+  )
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDrawerRendered, setIsDrawerRendered] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -51,30 +57,12 @@ export default function MobileBeerCatalog() {
     touchAction: string
   } | null>(null)
 
-  const tagOptions = useMemo(() => {
-    const uniqueTags = getBeerAttributeOptions()
-
-    return [
-      { value: "all", label: "All attributes" },
-      ...uniqueTags.map((tag) => ({
-        value: tag,
-        label: tag.charAt(0).toUpperCase() + tag.slice(1),
-      })),
-    ]
-  }, [])
-
   const filteredBeers = useMemo(
-    () =>
-      mockBeers.filter((beer) => {
-        const matchesAvailability = availability === "all" || beer.availability === availability
-        const matchesTag = selectedTag === "all" || (beer.tags ?? []).includes(selectedTag)
-
-        return matchesAvailability && matchesTag
-      }),
-    [availability, selectedTag]
+    () => beers.filter((beer) => beerMatchesFilterSelections(beer, selectedFilters)),
+    [beers, selectedFilters]
   )
 
-  const activeFilterCount = Number(availability !== "all") + Number(selectedTag !== "all")
+  const activeFilterCount = countBeerFilterSelections(selectedFilters)
   const hasActiveFilters = activeFilterCount > 0
 
   useEffect(() => {
@@ -205,8 +193,11 @@ export default function MobileBeerCatalog() {
   })
 
   const clearFilters = () => {
-    setAvailability("all")
-    setSelectedTag("all")
+    setSelectedFilters(createEmptyBeerFilterSelections)
+  }
+
+  const toggleFilterOption = (key: BeerFilterGroupKey, value: string) => {
+    setSelectedFilters((current) => toggleBeerFilterSelection(current, key, value))
   }
 
   return (
@@ -274,7 +265,7 @@ export default function MobileBeerCatalog() {
                   isDrawerOpen ? "translate-x-0" : "translate-x-full"
                 }`}
                 {...drawerSwipeHandlers}
-                >
+              >
                 <MobileDrawerHeader
                   closeLabel="Close beer filters"
                   title="Beer Menu"
@@ -285,9 +276,9 @@ export default function MobileBeerCatalog() {
                   <div className="grid gap-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                        Availability
+                        Filters
                       </p>
-                      {availability !== "all" || selectedTag !== "all" ? (
+                      {hasActiveFilters ? (
                         <button
                           type="button"
                           onClick={clearFilters}
@@ -298,52 +289,43 @@ export default function MobileBeerCatalog() {
                       ) : null}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      {availabilityOptions.map((option) => {
-                        const isSelected = availability === option.value
+                    <div className="grid gap-4">
+                      {beerFilterGroups.map((group) => {
+                        const selectedValues = selectedFilters[group.key] ?? []
 
                         return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => setAvailability(option.value)}
-                            aria-pressed={isSelected}
-                            className={`min-h-12 rounded-[18px] border px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f172a]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
-                              isSelected
-                                ? "border-[#0f172a] bg-[#0f172a] text-white shadow-[0_12px_24px_rgba(15,23,42,0.14)]"
-                                : "border-black/10 bg-white/70 text-black hover:bg-white"
-                            }`}
-                          >
-                            {option.label}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
+                          <div key={group.key} className="grid gap-2">
+                            <div className="space-y-1">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
+                                {group.title}
+                              </p>
+                              <p className="text-[11px] leading-relaxed text-neutral-500">
+                                {group.description}
+                              </p>
+                            </div>
 
-                  <div className="grid gap-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                      Attributes
-                    </p>
+                            <div className="flex flex-wrap gap-2">
+                              {group.options.map((option) => {
+                                const isSelected = selectedValues.includes(option.value)
 
-                    <div className="flex flex-wrap gap-2">
-                      {tagOptions.map((option) => {
-                        const isSelected = selectedTag === option.value
-
-                        return (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => setSelectedTag(option.value)}
-                            aria-pressed={isSelected}
-                            className={`inline-flex min-h-10 items-center justify-center rounded-full border px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f172a]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
-                              isSelected
-                                ? "border-[#0f172a] bg-[#0f172a] text-white shadow-[0_12px_24px_rgba(15,23,42,0.14)]"
-                                : "border-black/10 bg-white/70 text-black hover:bg-white"
-                            }`}
-                          >
-                            {option.label}
-                          </button>
+                                return (
+                                  <button
+                                    key={option.value}
+                                    type="button"
+                                    onClick={() => toggleFilterOption(group.key, option.value)}
+                                    aria-pressed={isSelected}
+                                    className={`inline-flex min-h-10 items-center justify-center rounded-full border px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f172a]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+                                      isSelected
+                                        ? "border-[#0f172a] bg-[#0f172a] text-white shadow-[0_12px_24px_rgba(15,23,42,0.14)]"
+                                        : "border-black/10 bg-white/70 text-black hover:bg-white"
+                                    }`}
+                                  >
+                                    {option.title}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
                         )
                       })}
                     </div>

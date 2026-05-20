@@ -3,13 +3,18 @@ import BeerCatalog from "@/components/beer/BeerCatalog"
 import MobileBeerCatalog from "@/components/beer/MobileBeerCatalog"
 import BeerHeader from "@/components/page-headers/BeerHeader"
 import MobileBeerHeader from "@/components/page-headers/MobileBeerHeader"
+import { getSanityBeers } from "@/lib/sanityBeers"
+
+export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Beer",
   description: "Explore ABCo beers on tap and seasonal releases.",
 }
 
-export default function BeerPage() {
+export default async function BeerPage() {
+  const beers = await getSanityBeers()
+
   return (
     <>
       <div className="hidden md:block">
@@ -21,10 +26,10 @@ export default function BeerPage() {
       </div>
 
       <div className="hidden md:block">
-        <BeerCatalog />
+        <BeerCatalog beers={beers} />
       </div>
 
-      <MobileBeerCatalog />
+      <MobileBeerCatalog beers={beers} />
     </>
   )
 }

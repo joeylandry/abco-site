@@ -8,18 +8,21 @@ import HomeNextEvent from "@/components/home/HomeNextEvent";
 import HomeFeaturedBeers from "@/components/home/HomeFeaturedBeers";
 import type { Metadata } from "next";
 import HomeDesktopAnnouncement from "@/components/home/HomeDesktopAnnouncement";
+import { getHomeHeroImages } from "@/lib/homeHeroImages";
 
 export const metadata: Metadata = {
   title: "Home",
   description: "Craft beer and community at ABCo.",
 };
 
+const homeHeroImages = getHomeHeroImages();
+
 export default function HomePage() {
   return (
     <>
-      <HomeHeroBMobile />
+      <HomeHeroBMobile images={homeHeroImages} />
       <div className="hidden md:block">
-        <HomeHeroB />
+        <HomeHeroB images={homeHeroImages} />
       </div>
       <HomeDesktopAnnouncement />
       <HomeMobileAnnouncements />

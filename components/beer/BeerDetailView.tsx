@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button"
 import { getBeerImageFrame, getBeerImageStyle } from "@/components/beer/beerImageFrame"
 import { getMobileBeerIconSrc } from "@/components/beer/mobileBeerArtwork"
 import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
+import { beerAttributeGroups } from "@/studio/schemaTypes/shared/beerAttributes"
 
 const CLEAR_EVENT_BUTTON_CLASS =
   "border border-black bg-transparent text-black shadow-none hover:bg-black/5 hover:text-black"
@@ -25,6 +26,30 @@ function formatAvailability(availability: "yearRound" | "seasonal" | "rotating")
   if (availability === "yearRound") return "Year round"
   if (availability === "seasonal") return "Seasonal"
   return "Rotating"
+}
+
+function formatBeerAttributes(beer: Beer) {
+  const attributeGroups = beerAttributeGroups.filter(
+    (group) => group.key !== "availability" && group.key !== "packaging",
+  )
+
+  return attributeGroups
+    .map((group) => {
+      const selectedValues = beer.filterSelections?.[group.key] ?? []
+      if (selectedValues.length === 0) {
+        return null
+      }
+
+      const selectedLabels = selectedValues.map((value) => {
+        return group.options.find((option) => option.value === value)?.title ?? value
+      })
+
+      return {
+        title: group.title,
+        values: selectedLabels.join(", "),
+      }
+    })
+    .filter((item): item is { title: string; values: string } => item !== null)
 }
 
 function getGalleryAspectRatio(imageSrc: string) {
@@ -116,11 +141,7 @@ function DesktopRotatingGallery({
     return () => window.clearInterval(interval)
   }, [images.length])
 
-  useEffect(() => {
-    if (activeIndex >= images.length) {
-      setActiveIndex(0)
-    }
-  }, [activeIndex, images.length])
+  const normalizedActiveIndex = images.length === 0 ? 0 : activeIndex % images.length
 
   if (!images.length) {
     return null
@@ -133,7 +154,9 @@ function DesktopRotatingGallery({
           <div
             key={`${beerName}-${imageSrc}-${index}`}
             className={`absolute inset-0 transition-all duration-700 ease-out ${
-              index === activeIndex ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-[1.02]"
+              index === normalizedActiveIndex
+                ? "opacity-100 scale-100"
+                : "pointer-events-none opacity-0 scale-[1.02]"
             }`}
           >
             <Image
@@ -163,9 +186,9 @@ function DesktopRotatingGallery({
               type="button"
               onClick={() => setActiveIndex(index)}
               aria-label={`Show gallery image ${index + 1}`}
-              aria-pressed={index === activeIndex}
+              aria-pressed={index === normalizedActiveIndex}
               className={`h-2.5 rounded-full transition-all duration-200 ${
-                index === activeIndex ? "w-8 bg-white" : "w-2.5 bg-white/45 hover:bg-white/70"
+                index === normalizedActiveIndex ? "w-8 bg-white" : "w-2.5 bg-white/45 hover:bg-white/70"
               }`}
             />
           ))}
@@ -224,6 +247,7 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
   const beerSpecs = [beer.abv > 0 ? `${beer.abv}% ABV` : null, beer.ibu ? `${beer.ibu} IBU` : null]
     .filter((value): value is string => value !== null)
     .join(" | ")
+  const beerAttributes = formatBeerAttributes(beer)
 
   return (
     <div className="bg-white">
@@ -356,14 +380,19 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
                       Attributes
                     </dt>
                     <dd className="mt-1 text-sm text-black/80">
-                      {beer.tags?.length ? beer.tags.join(", ") : "Details coming soon"}
+                      {beerAttributes.length ? (
+                        <div className="grid gap-1">
+                          {beerAttributes.map((attribute) => (
+                            <div key={attribute.title}>
+                              <span className="font-semibold text-black/90">{attribute.title}:</span>{" "}
+                              <span>{attribute.values}</span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        "Details coming soon"
+                      )}
                     </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50">
-                      Pour Notes
-                    </dt>
-                    <dd className="mt-1 text-sm text-black/80">{beer.shortDescription}</dd>
                   </div>
                 </dl>
 

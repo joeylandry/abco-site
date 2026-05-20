@@ -101,6 +101,7 @@ export const teamMember = defineType({
       title: 'Sort Order',
       type: 'number',
       group: 'content',
+      description: 'Controls the order this item appears on the site. Lower numbers appear first.',
       initialValue: 0,
     }),
     defineField({

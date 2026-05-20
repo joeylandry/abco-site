@@ -13,10 +13,19 @@ import {visitPage} from './documents/visitPage'
 import {addressBlock} from './objects/addressBlock'
 import {ctaLink} from './objects/ctaLink'
 import {cta} from './objects/cta'
+import {announcementBlock} from './objects/announcementBlock'
+import {beerFinderPromoBlock} from './objects/beerFinderPromoBlock'
+import {beerLegacyImageWithAlt} from './objects/beerLegacyImageWithAlt'
+import {beerTeaserBlock} from './objects/beerTeaserBlock'
+import {beerImageUpload} from './objects/beerImageUpload'
+import {customCalloutBlock} from './objects/customCalloutBlock'
 import {docuseriesEpisode} from './objects/docuseriesEpisode'
 import {galleryImage} from './objects/galleryImage'
 import {hoursLine} from './objects/hoursLine'
+import {heroBlock} from './objects/heroBlock'
 import {imageWithAlt} from './objects/imageWithAlt'
+import {missionBlock} from './objects/missionBlock'
+import {nextEventSpotlightBlock} from './objects/nextEventSpotlightBlock'
 import {navItem} from './objects/navItem'
 import {richText} from './objects/portableText'
 import {seo} from './objects/seo'
@@ -27,7 +36,12 @@ export const schemaTypes = [
   aboutPage,
   addressBlock,
   announcement,
+  announcementBlock,
   beer,
+  beerImageUpload,
+  beerLegacyImageWithAlt,
+  beerFinderPromoBlock,
+  beerTeaserBlock,
   bookEventPage,
   cta,
   ctaLink,
@@ -36,12 +50,16 @@ export const schemaTypes = [
   event,
   galleryImage,
   hoursLine,
+  heroBlock,
   imageWithAlt,
   homeAnnouncement,
   homePage,
   jobOpening,
   jobsPage,
+  customCalloutBlock,
   navItem,
+  missionBlock,
+  nextEventSpotlightBlock,
   richText,
   seo,
   siteSettings,

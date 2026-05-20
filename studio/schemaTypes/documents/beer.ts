@@ -1,124 +1,126 @@
 import {defineField, defineType} from 'sanity'
+import {
+  beerAttributeGroups,
+  beerAvailabilityOptions,
+  beerPackagingOptions,
+  bodyAndFeelOptions,
+  appearanceOptions,
+  hopCharacterOptions,
+  maltCharacterOptions,
+  overallProfileOptions,
+  yeastFermentationOptions,
+} from '../shared/beerAttributes'
 
-const availabilityOptions = [
-  {title: 'Year-round', value: 'yearRound'},
-  {title: 'Seasonal', value: 'seasonal'},
-  {title: 'Rotating / Limited', value: 'rotating'},
-]
+const beerAttributeFields = beerAttributeGroups.map((field) =>
+  field.key === 'appearanceSelections'
+    ? defineField({
+        name: 'appearanceSelections',
+        title: field.title,
+        type: 'array',
+        of: [{type: 'string'}],
+        description: field.description,
+        options: {
+          list: field.options as Array<{title: string; value: string}>,
+          layout: 'checkbox' as unknown as 'list',
+        },
+        validation: (Rule) => Rule.custom(validateUniqueStrings),
+      })
+    : checkboxField(
+        field.key,
+        field.title,
+        field.options as Array<{title: string; value: string}>,
+        field.description,
+      ),
+)
 
-const packagingOptions = [
-  {title: 'Draft', value: 'draft'},
-  {title: 'Cans', value: 'cans'},
-  {title: 'Bottles', value: 'bottles'},
-  {title: 'Crowlers', value: 'crowlers'},
-]
-
-const appearanceOptions = [
-  {title: 'Hazy', value: 'hazy'},
-  {title: 'Clear', value: 'clear'},
-  {title: 'Dark', value: 'dark'},
-  {title: 'Golden', value: 'golden'},
-  {title: 'Amber', value: 'amber'},
-  {title: 'Ruby', value: 'ruby'},
-]
-
-const maltCharacterOptions = [
-  {title: 'Malty', value: 'malty'},
-  {title: 'Rich', value: 'rich'},
-  {title: 'Roasty', value: 'roasty'},
-  {title: 'Toasty', value: 'toasty'},
-  {title: 'Caramel', value: 'caramel'},
-  {title: 'Chocolate', value: 'chocolate'},
-  {title: 'Coffee', value: 'coffee'},
-  {title: 'Biscuity', value: 'biscuity'},
-  {title: 'Bready', value: 'bready'},
-  {title: 'Smoky', value: 'smoky'},
-  {title: 'Vanilla', value: 'vanilla'},
-  {title: 'Barrel-Aged', value: 'barrelAged'},
-]
-
-const hopCharacterOptions = [
-  {title: 'Piney', value: 'piney'},
-  {title: 'Resinous', value: 'resinous'},
-  {title: 'Floral', value: 'floral'},
-  {title: 'Earthy', value: 'earthy'},
-  {title: 'Herbal', value: 'herbal'},
-  {title: 'Tropical', value: 'tropical'},
-  {title: 'Citrusy', value: 'citrusy'},
-  {title: 'Stone Fruit', value: 'stoneFruit'},
-  {title: 'Berry', value: 'berry'},
-]
-
-const yeastFermentationOptions = [
-  {title: 'Crisp', value: 'crisp'},
-  {title: 'Clean', value: 'clean'},
-  {title: 'Funky', value: 'funky'},
-  {title: 'Spicy', value: 'spicy'},
-  {title: 'Fruity', value: 'fruity'},
-  {title: 'Belgian', value: 'belgian'},
-  {title: 'Sour', value: 'sour'},
-  {title: 'Tart', value: 'tart'},
-  {title: 'Juicy', value: 'juicy'},
-  {title: 'Clove', value: 'clove'},
-  {title: 'Banana', value: 'banana'},
-]
-
-const bodyAndFeelOptions = [
-  {title: 'Light-bodied', value: 'lightBodied'},
-  {title: 'Medium-Bodied', value: 'mediumBodied'},
-  {title: 'Full-bodied', value: 'fullBodied'},
-  {title: 'Smooth', value: 'smooth'},
-  {title: 'Creamy', value: 'creamy'},
-  {title: 'Dry', value: 'dry'},
-  {title: 'Effervescent', value: 'effervescent'},
-]
-
-const overallProfileOptions = [
-  {title: 'Balanced', value: 'balanced'},
-  {title: 'Complex', value: 'complex'},
-  {title: 'Refreshing', value: 'refreshing'},
-  {title: 'Bold', value: 'bold'},
-  {title: 'Easy-drinking', value: 'easyDrinking'},
-]
-
-const attributeFieldGroups = [
-  {
-    name: 'appearance',
-    title: 'Appearance',
-    description: 'Select every visual trait that applies.',
-    options: appearanceOptions,
+const legacyAppearanceField = defineField({
+  name: 'appearance',
+  title: 'Legacy Appearance',
+  type: 'string',
+  description: 'Legacy single-select appearance preserved for existing beer documents.',
+  hidden: true,
+  deprecated: {
+    reason: 'Use Appearance multi-select instead.',
   },
-  {
+    options: {
+      list: appearanceOptions,
+      layout: 'radio',
+    },
+})
+
+const legacyBeerAttributeFields = [
+  legacyAppearanceField,
+  defineField({
     name: 'maltCharacter',
-    title: 'Malt Character',
-    description: 'Use checkboxes to capture every malt note that fits.',
-    options: maltCharacterOptions,
-  },
-  {
+    title: 'Legacy Malt Character',
+    type: 'array',
+    of: [{type: 'string'}],
+    hidden: true,
+    deprecated: {
+      reason: 'Use Attributes -> Malt Character instead.',
+    },
+    options: {
+      list: maltCharacterOptions,
+      layout: 'checkbox' as unknown as 'list',
+    },
+  }),
+  defineField({
     name: 'hopCharacter',
-    title: 'Hop Character',
-    description: 'Select all hop notes that show up in the beer.',
-    options: hopCharacterOptions,
-  },
-  {
+    title: 'Legacy Hop Character',
+    type: 'array',
+    of: [{type: 'string'}],
+    hidden: true,
+    deprecated: {
+      reason: 'Use Attributes -> Hop Character instead.',
+    },
+    options: {
+      list: hopCharacterOptions,
+      layout: 'checkbox' as unknown as 'list',
+    },
+  }),
+  defineField({
     name: 'yeastAndFermentation',
-    title: 'Yeast and Fermentation',
-    description: 'Choose every fermentation character that applies.',
-    options: yeastFermentationOptions,
-  },
-  {
+    title: 'Legacy Yeast and Fermentation',
+    type: 'array',
+    of: [{type: 'string'}],
+    hidden: true,
+    deprecated: {
+      reason: 'Use Attributes -> Yeast and Fermentation instead.',
+    },
+    options: {
+      list: yeastFermentationOptions,
+      layout: 'checkbox' as unknown as 'list',
+    },
+  }),
+  defineField({
     name: 'bodyAndFeel',
-    title: 'Body and Feel',
-    description: 'Pick all body and mouthfeel traits that describe the beer.',
-    options: bodyAndFeelOptions,
-  },
-  {
+    title: 'Legacy Body and Feel',
+    type: 'array',
+    of: [{type: 'string'}],
+    hidden: true,
+    deprecated: {
+      reason: 'Use Attributes -> Body and Feel instead.',
+    },
+    options: {
+      list: bodyAndFeelOptions,
+      layout: 'checkbox' as unknown as 'list',
+    },
+  }),
+  defineField({
     name: 'overallProfile',
-    title: 'Overall Profile',
-    description: "Use these checkboxes for the beer's broad personality.",
-    options: overallProfileOptions,
-  },
-] as const
+    title: 'Legacy Overall Profile',
+    type: 'array',
+    of: [{type: 'string'}],
+    hidden: true,
+    deprecated: {
+      reason: 'Use Attributes -> Overall Profile instead.',
+    },
+    options: {
+      list: overallProfileOptions,
+      layout: 'checkbox' as unknown as 'list',
+    },
+  }),
+]
 
 const validateUniqueStrings = (value: unknown) => {
   if (!Array.isArray(value)) {
@@ -157,13 +159,48 @@ function checkboxField(
     description,
     options: {
       list: options,
-      layout: 'checkbox' as any,
+      layout: 'checkbox' as unknown as 'list',
     },
     validation: (Rule) => {
       const baseRule = required ? Rule.required().min(1) : Rule
       return baseRule.custom(validateUniqueStrings)
     },
   })
+}
+
+const validateBeerImageUploads = (value: unknown) => {
+  if (!Array.isArray(value)) {
+    return true
+  }
+
+  const counts = value.reduce(
+    (acc, item) => {
+      if (typeof item !== 'object' || item === null) {
+        return acc
+      }
+
+      const imageType = (item as {imageType?: string}).imageType
+      if (imageType === 'mainDesktop') {
+        acc.mainDesktop += 1
+      }
+      if (imageType === 'desktopHoverMobile') {
+        acc.desktopHoverMobile += 1
+      }
+
+      return acc
+    },
+    {mainDesktop: 0, desktopHoverMobile: 0},
+  )
+
+  if (counts.mainDesktop > 1) {
+    return 'Only one image can be marked as the main desktop image.'
+  }
+
+  if (counts.desktopHoverMobile > 1) {
+    return 'Only one image can be marked as the desktop hover / main mobile image.'
+  }
+
+  return true
 }
 
 export const beer = defineType({
@@ -196,6 +233,16 @@ export const beer = defineType({
       type: 'string',
       group: 'core',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'name',
+      title: 'Legacy Beer Name',
+      type: 'string',
+      group: 'core',
+      hidden: true,
+      deprecated: {
+        reason: 'Legacy field preserved for existing beer documents. Use Beer Name instead.',
+      },
     }),
     defineField({
       name: 'slug',
@@ -245,20 +292,41 @@ export const beer = defineType({
       group: 'core',
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'description',
+      title: 'Legacy Description',
+      type: 'text',
+      rows: 4,
+      group: 'core',
+      hidden: true,
+      deprecated: {
+        reason: 'Legacy field preserved for existing beer documents. Use Short Description and Long Description instead.',
+      },
+    }),
     checkboxField(
       'availability',
       'Availability',
-      availabilityOptions,
+      beerAvailabilityOptions,
       'Select every availability window that applies. This is a checkbox list, not a single choice.',
       true,
     ),
     checkboxField(
       'packaging',
       'Packaging',
-      packagingOptions,
+      beerPackagingOptions,
       'Select every package format this beer is sold in. Multiple checkboxes can be selected.',
       true,
     ),
+    defineField({
+      name: 'attributes',
+      title: 'Attributes',
+      type: 'object',
+      group: 'taste',
+      description:
+        'Grouped beer attribute checkboxes that describe appearance, flavor, and body. Existing saved values stay intact.',
+      fields: [legacyAppearanceField, ...beerAttributeFields],
+    }),
+    ...legacyBeerAttributeFields,
     defineField({
       name: 'active',
       title: 'Active',
@@ -271,18 +339,9 @@ export const beer = defineType({
       title: 'Sort Order',
       type: 'number',
       group: 'core',
+      description: 'Controls the order this item appears on the site. Lower numbers appear first.',
       initialValue: 0,
-      validation: (Rule) => Rule.required().integer(),
     }),
-
-    ...attributeFieldGroups.map((field) =>
-      checkboxField(
-        field.name,
-        field.title,
-        field.options as Array<{title: string; value: string}>,
-        field.description,
-      ),
-    ),
 
     defineField({
       name: 'cardColor',
@@ -290,10 +349,15 @@ export const beer = defineType({
       type: 'string',
       group: 'photos',
       description: 'Use a 6-digit hex color, for example #1f2937.',
+      initialValue: '#FFFFFF',
       validation: (Rule) =>
-        Rule.required().custom((value) => {
+        Rule.custom((value) => {
+          if (value == null || value === '') {
+            return true
+          }
+
           if (typeof value !== 'string') {
-            return 'Card color is required.'
+            return 'Use a 6-digit hex color like #1f2937.'
           }
 
           return /^#([0-9a-fA-F]{6})$/.test(value)
@@ -304,16 +368,82 @@ export const beer = defineType({
     defineField({
       name: 'primaryImage',
       title: 'Primary / Card Image',
-      type: 'imageWithAlt',
+      type: 'beerLegacyImageWithAlt',
       group: 'photos',
-      validation: (Rule) => Rule.required(),
+      hidden: true,
+      deprecated: {
+        reason: 'Use Beer Can Clipart and Beer Images instead.',
+      },
+    }),
+    defineField({
+      name: 'cardImage',
+      title: 'Main Beer Card Image / Can Image',
+      type: 'beerLegacyImageWithAlt',
+      group: 'photos',
+      hidden: true,
+      deprecated: {
+        reason: 'Use Beer Can Clipart and Beer Images instead.',
+      },
+    }),
+    defineField({
+      name: 'hoverImage',
+      title: 'Hover Image / Main Mobile Image',
+      type: 'beerLegacyImageWithAlt',
+      group: 'photos',
+      hidden: true,
+      deprecated: {
+        reason: 'Use Beer Images instead.',
+      },
+    }),
+    defineField({
+      name: 'galleryImage',
+      title: 'Gallery Image',
+      type: 'beerLegacyImageWithAlt',
+      group: 'photos',
+      hidden: true,
+      deprecated: {
+        reason: 'Use Beer Images instead.',
+      },
+    }),
+    defineField({
+      name: 'beerCanClipart',
+      title: 'Beer Can Clipart',
+      type: 'image',
+      group: 'photos',
+      description: 'Optional single beer can clipart image.',
+      options: {
+        hotspot: true,
+      },
+    }),
+    defineField({
+      name: 'beerImages',
+      title: 'Beer Images',
+      type: 'array',
+      group: 'photos',
+      description:
+        'Upload up to 10 images. Mark one as the main desktop image, one as the desktop hover / main mobile image, and use gallery images for the rest.',
+      of: [{type: 'beerImageUpload'}],
+      validation: (Rule) => Rule.max(10).custom(validateBeerImageUploads),
+    }),
+    defineField({
+      name: 'image',
+      title: 'Legacy Primary Image',
+      type: 'beerLegacyImageWithAlt',
+      group: 'photos',
+      hidden: true,
+      deprecated: {
+        reason: 'Legacy field preserved for existing beer documents. Use Primary / Card Image instead.',
+      },
     }),
     defineField({
       name: 'secondaryImage',
       title: 'Secondary Hover / Mobile Image',
-      type: 'imageWithAlt',
+      type: 'beerLegacyImageWithAlt',
       group: 'photos',
-      validation: (Rule) => Rule.required(),
+      hidden: true,
+      deprecated: {
+        reason: 'Use Beer Images instead.',
+      },
     }),
     defineField({
       name: 'galleryImages',
@@ -323,6 +453,21 @@ export const beer = defineType({
       of: [{type: 'galleryImage'}],
       description: 'Add up to 10 images. Reorder them to control the gallery sequence in the detail view.',
       validation: (Rule) => Rule.max(10),
+      hidden: true,
+      deprecated: {
+        reason: 'Use Beer Images instead.',
+      },
+    }),
+    defineField({
+      name: 'detailImages',
+      title: 'Legacy Detail Images',
+      type: 'array',
+      group: 'photos',
+      of: [{type: 'beerLegacyImageWithAlt'}],
+      hidden: true,
+      deprecated: {
+        reason: 'Legacy field preserved for existing beer documents. Use Gallery / Detail Images instead.',
+      },
     }),
     defineField({
       name: 'featured',
@@ -389,7 +534,10 @@ export const beer = defineType({
       bestSeller: 'bestSeller',
       limitedRelease: 'limitedRelease',
       slug: 'slug.current',
-      primaryImage: 'primaryImage.image',
+      beerCanClipart: 'beerCanClipart',
+      beerImages: 'beerImages',
+      cardImage: 'cardImage',
+      primaryImage: 'primaryImage',
     },
     prepare({
       title,
@@ -401,8 +549,17 @@ export const beer = defineType({
       bestSeller,
       limitedRelease,
       slug,
+      beerCanClipart,
+      beerImages,
+      cardImage,
       primaryImage,
     }) {
+      const selectedPreviewImage = Array.isArray(beerImages)
+        ? beerImages.find((item) => item?.imageType === 'mainDesktop')?.image ??
+          beerImages.find((item) => item?.imageType === 'desktopHoverMobile')?.image ??
+          beerImages.find((item) => item?.imageType === 'gallery')?.image
+        : null
+
       const flags = [
         featured ? 'Featured' : null,
         newRelease ? 'New Release' : null,
@@ -421,7 +578,7 @@ export const beer = defineType({
         ]
           .filter((value): value is string => value !== null && value !== '')
           .join(' · '),
-        media: primaryImage,
+        media: selectedPreviewImage ?? beerCanClipart ?? cardImage ?? primaryImage,
       }
     },
   },

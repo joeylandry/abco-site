@@ -1,5 +1,10 @@
 import type { Beer } from "@/components/beer/BeerCard"
 import { beerCardColors } from "@/lib/beerPalette"
+import {
+  beerFilterGroups,
+  createEmptyBeerFilterSelections,
+  type BeerFilterSelections,
+} from "@/studio/schemaTypes/shared/beerAttributes"
 
 type BeerGallerySelection = {
   gallerySrcs: string[]
@@ -117,6 +122,147 @@ function buildBeerMedia(beerId: string, primarySrc: string, alt: string) {
     },
     detailImages: hoverSrc && extraSrc ? [primarySrc, hoverSrc, extraSrc] : [primarySrc, "/beer/beer2_temp.png", primarySrc],
   }
+}
+
+const beerFilterSelectionsById: Record<string, BeerFilterSelections> = {
+  "my-juicy-gf": {
+    availability: ["yearRound"],
+    packaging: ["draft", "cans"],
+    appearanceSelections: ["hazy"],
+    hopCharacter: ["citrusy", "tropical"],
+    yeastAndFermentation: ["clean", "fruity", "juicy"],
+    bodyAndFeel: ["smooth", "creamy"],
+    overallProfile: ["refreshing", "easyDrinking"],
+  },
+  "foxy-librarian-2025": {
+    availability: ["rotating"],
+    packaging: ["bottles"],
+    appearanceSelections: ["clear", "golden"],
+    maltCharacter: ["rich", "toasty", "vanilla"],
+    hopCharacter: ["floral", "stoneFruit"],
+    yeastAndFermentation: ["belgian", "spicy", "fruity"],
+    bodyAndFeel: ["fullBodied", "dry"],
+    overallProfile: ["bold", "complex"],
+  },
+  menotomator: {
+    availability: ["seasonal"],
+    packaging: ["draft", "cans"],
+    appearanceSelections: ["dark", "amber"],
+    maltCharacter: ["malty", "rich", "roasty", "toasty", "caramel", "chocolate"],
+    bodyAndFeel: ["fullBodied", "smooth", "creamy"],
+    overallProfile: ["balanced", "complex"],
+  },
+  "time-only-goes": {
+    availability: ["rotating"],
+    packaging: ["draft", "cans"],
+    appearanceSelections: ["clear", "golden"],
+    hopCharacter: ["piney", "resinous", "citrusy"],
+    yeastAndFermentation: ["crisp", "clean"],
+    bodyAndFeel: ["lightBodied", "dry", "effervescent"],
+    overallProfile: ["bold", "refreshing"],
+  },
+  "bike-path": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["golden", "clear"],
+    hopCharacter: ["citrusy", "floral", "herbal"],
+    yeastAndFermentation: ["crisp", "clean"],
+    bodyAndFeel: ["lightBodied", "dry"],
+    overallProfile: ["refreshing", "easyDrinking"],
+  },
+  jedermann: {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["golden", "amber"],
+    maltCharacter: ["bready", "caramel", "biscuity"],
+    bodyAndFeel: ["mediumBodied", "smooth"],
+    overallProfile: ["balanced", "complex"],
+  },
+  "marleys-ghost": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["dark", "ruby"],
+    maltCharacter: ["roasty", "chocolate", "smoky"],
+    yeastAndFermentation: ["funky", "spicy", "fruity", "sour", "tart"],
+    bodyAndFeel: ["fullBodied", "dry"],
+    overallProfile: ["bold", "complex"],
+  },
+  "money-comes-and-goes": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["golden", "clear"],
+    hopCharacter: ["tropical", "citrusy", "berry"],
+    bodyAndFeel: ["mediumBodied", "smooth"],
+    overallProfile: ["bold", "refreshing"],
+  },
+  "my-new-gf": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["hazy"],
+    hopCharacter: ["tropical", "citrusy", "berry"],
+    yeastAndFermentation: ["juicy", "fruity"],
+    bodyAndFeel: ["smooth", "creamy"],
+    overallProfile: ["refreshing", "easyDrinking"],
+  },
+  presita: {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["amber", "clear"],
+    maltCharacter: ["toasty", "caramel", "bready"],
+    hopCharacter: ["floral", "earthy", "herbal"],
+    bodyAndFeel: ["mediumBodied", "smooth"],
+    overallProfile: ["balanced", "complex"],
+  },
+  "spy-p-a": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["clear", "golden"],
+    hopCharacter: ["piney", "resinous", "citrusy"],
+    yeastAndFermentation: ["crisp", "clean"],
+    bodyAndFeel: ["dry", "lightBodied"],
+    overallProfile: ["bold", "refreshing"],
+  },
+  "stave-450": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["dark", "amber"],
+    maltCharacter: ["barrelAged", "roasty", "chocolate", "coffee", "smoky"],
+    bodyAndFeel: ["fullBodied", "smooth"],
+    overallProfile: ["complex", "bold"],
+  },
+  "trafford-ale": {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["golden", "clear"],
+    maltCharacter: ["bready", "biscuity", "caramel"],
+    hopCharacter: ["floral", "earthy", "herbal"],
+    bodyAndFeel: ["mediumBodied", "smooth"],
+    overallProfile: ["balanced", "easyDrinking"],
+  },
+  walter: {
+    availability: ["rotating"],
+    packaging: ["draft"],
+    appearanceSelections: ["golden", "clear"],
+    maltCharacter: ["malty", "bready"],
+    bodyAndFeel: ["smooth", "mediumBodied"],
+    overallProfile: ["balanced", "easyDrinking"],
+  },
+}
+
+export function getBeerFilterSelections(beerId: string) {
+  return beerFilterSelectionsById[beerId] ?? createEmptyBeerFilterSelections()
+}
+
+export function beerMatchesFilterSelections(beer: Beer, selections: BeerFilterSelections) {
+  return beerFilterGroups.every(({ key }) => {
+    const selectedValues = selections[key] ?? []
+    if (selectedValues.length === 0) {
+      return true
+    }
+
+    const beerValues = beer.filterSelections?.[key] ?? getBeerFilterSelections(beer.id)[key] ?? []
+    return selectedValues.some((value) => beerValues.includes(value))
+  })
 }
 
 export const mockBeers: Beer[] = [
@@ -330,8 +476,4 @@ export function getBeerById(id: string) {
 
 export function getRelatedBeers(currentId: string, count = 6) {
   return mockBeers.filter((beer) => beer.id !== currentId).slice(0, count)
-}
-
-export function getBeerAttributeOptions() {
-  return Array.from(new Set(mockBeers.flatMap((beer) => beer.tags ?? []))).sort()
 }

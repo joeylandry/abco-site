@@ -43,7 +43,7 @@ export default function MobileBeerCard({
   interactive?: boolean
 }) {
   const secondarySrc = beer.image.secondarySrc
-  const imageStageColor = beer.cardColor
+  const imageStageColor = beer.cardColor ?? "#FFFFFF"
   const contentPanelColor = mixHex(imageStageColor, "#FFFFFF", 0.24)
   const textColor = getRelativeLuminance(contentPanelColor) < 0.34 ? "#FFFFFF" : "#161616"
   const taglineColor = mixHex(textColor, contentPanelColor, textColor === "#FFFFFF" ? 0.16 : 0.2)

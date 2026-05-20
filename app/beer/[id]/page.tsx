@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import BeerDetailView from "@/components/beer/BeerDetailView"
-import { getBeerById, getRelatedBeers, mockBeers } from "@/app/beer/mockBeers"
+import { getRelatedBeers } from "@/app/beer/mockBeers"
+import { getSanityBeerBySlug } from "@/lib/sanityBeers"
+
+export const dynamic = "force-dynamic"
 
 type BeerDetailPageProps = {
   params: Promise<{
@@ -9,17 +12,11 @@ type BeerDetailPageProps = {
   }>
 }
 
-export async function generateStaticParams() {
-  return mockBeers.map((beer) => ({
-    id: beer.id,
-  }))
-}
-
 export async function generateMetadata({
   params,
 }: BeerDetailPageProps): Promise<Metadata> {
   const { id } = await params
-  const beer = getBeerById(id)
+  const beer = await getSanityBeerBySlug(id)
 
   if (!beer) {
     return {
@@ -35,7 +32,7 @@ export async function generateMetadata({
 
 export default async function BeerDetailPage({ params }: BeerDetailPageProps) {
   const { id } = await params
-  const beer = getBeerById(id)
+  const beer = await getSanityBeerBySlug(id)
 
   if (!beer) {
     notFound()

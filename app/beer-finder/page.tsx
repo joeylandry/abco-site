@@ -28,18 +28,6 @@ function isCompleteZipCode(value: string) {
   return ZIP_CODE_PATTERN.test(value.trim())
 }
 
-function formatPullTimestamp(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "America/New_York",
-    timeZoneName: "short",
-  }).format(new Date(value))
-}
-
 function resolveBeerFilter(rawBeer: string) {
   const trimmedBeer = rawBeer.trim()
 
@@ -125,47 +113,6 @@ export default async function BeerFinderPage({ searchParams }: BeerFinderPagePro
                 initialZip={initialZip}
               />
             </div>
-
-            <section className="hidden px-6 pb-12 md:block md:pb-16">
-              <div className="mx-auto max-w-7xl rounded-[24px] border border-black/10 bg-[#f4f0e8] px-6 py-5 shadow-sm sm:px-7 sm:py-6">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/52">Recent API Pull</p>
-                    <p className="mt-3 max-w-3xl text-sm leading-7 text-black/62">
-                      Current Beer Finder data from Breww based on the latest server pull.
-                    </p>
-                  </div>
-
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black/42">
-                    Pulled {formatPullTimestamp(data.generatedAt)}
-                  </p>
-                </div>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-[18px] border border-black/10 bg-white/70 px-4 py-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45">Lookback</p>
-                    <p className="mt-2 font-heading text-3xl leading-none text-black">{data.lookbackDays}</p>
-                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-black/42">Days</p>
-                  </div>
-
-                  <div className="rounded-[18px] border border-black/10 bg-white/70 px-4 py-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45">Locations</p>
-                    <p className="mt-2 font-heading text-3xl leading-none text-black">{data.locations.length}</p>
-                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-black/42">
-                      Recent external accounts
-                    </p>
-                  </div>
-
-                  <div className="rounded-[18px] border border-black/10 bg-white/70 px-4 py-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45">Beers</p>
-                    <p className="mt-2 font-heading text-3xl leading-none text-black">{data.beerNames.length}</p>
-                    <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-black/42">
-                      Distinct beers in pull
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
           </>
         )}
       </div>

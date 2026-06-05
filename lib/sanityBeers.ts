@@ -36,7 +36,6 @@ type SanityBeerDoc = {
     bodyAndFeel?: string[] | null
     overallProfile?: string[] | null
   } | null
-  appearance?: string | null
   maltCharacter?: string[] | null
   hopCharacter?: string[] | null
   yeastAndFermentation?: string[] | null
@@ -79,7 +78,6 @@ const beerQueryFields = `{
     bodyAndFeel,
     overallProfile
   },
-  appearance,
   maltCharacter,
   hopCharacter,
   yeastAndFermentation,
@@ -88,7 +86,7 @@ const beerQueryFields = `{
   "beerImages": beerImages[] {
     imageType,
     "url": image.asset->url,
-    "alt": coalesce(image.alt, ^.title)
+    "alt": coalesce(alt, ^.title)
   },
   "primaryImage": primaryImage {
     "url": image.asset->url,
@@ -186,7 +184,7 @@ function getBeerFilterSelections(doc: SanityBeerDoc): BeerFilterSelections {
     ...createEmptyBeerFilterSelections(),
     availability: normalizeStringList(doc.availability),
     packaging: normalizeStringList(doc.packaging),
-    appearanceSelections: normalizeStringList(attributes.appearanceSelections ?? doc.appearance),
+    appearanceSelections: normalizeStringList(attributes.appearanceSelections),
     maltCharacter: normalizeStringList(attributes.maltCharacter ?? doc.maltCharacter),
     hopCharacter: normalizeStringList(attributes.hopCharacter ?? doc.hopCharacter),
     yeastAndFermentation: normalizeStringList(attributes.yeastAndFermentation ?? doc.yeastAndFermentation),

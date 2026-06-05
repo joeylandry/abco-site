@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type MutableRefObject } from "react"
 import { mockBeers } from "@/app/beer/mockBeers"
 import type { BeerFinderLocation } from "@/lib/breww"
+import { BEER_FINDER_MOBILE_ICON_SRC } from "@/components/beer/mobileBeerArtwork"
 import {
   getLeaflet,
   hasCoordinates,
@@ -95,11 +96,6 @@ const SEARCH_RADIUS_MILES = 1
 const ZIP_CODE_PATTERN = /^\d{5}$/
 const TRACKPAD_WHEEL_ZOOM_SENSITIVITY = 0.0045
 const TRACKPAD_GESTURE_ZOOM_SENSITIVITY = 4.25
-
-const BEER_FINDER_PAGE_BACKDROP =
-  "radial-gradient(circle at top left, rgba(116, 195, 213, 0.28) 0%, transparent 34%)," +
-  "radial-gradient(circle at bottom right, rgba(116, 195, 213, 0.22) 0%, transparent 36%)," +
-  "linear-gradient(180deg, rgba(116, 195, 213, 0.1) 0%, transparent 42%)"
 
 function normalizeBeerFilterText(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "")
@@ -477,37 +473,32 @@ function buildMarkerTooltipMarkup(location: BeerFinderLocation, distanceLabel: s
 }
 
 function buildLocationIcon(leaflet: LeafletRuntime, isSelected: boolean) {
-  const width = isSelected ? 24 : 20
-  const height = isSelected ? 36 : 32
+  const size = isSelected ? 40 : 34
 
   return leaflet.divIcon({
     className: "beer-finder-map-marker",
     html: `
-      <svg
-        width="${width}"
-        height="${height}"
-        viewBox="0 0 28 40"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style="overflow:visible;filter:drop-shadow(0 6px 12px rgba(15,23,42,0.14));"
-      >
-        <defs>
-          <linearGradient id="beerFinderPinGradient" x1="14" y1="2" x2="14" y2="34" gradientUnits="userSpaceOnUse">
-            <stop stop-color="${isSelected ? "#ef4444" : "#34c979"}" />
-            <stop offset="1" stop-color="${isSelected ? "#b91c1c" : "#1d9557"}" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M14 1.5C7.37 1.5 2 6.87 2 13.5C2 22.56 10.7 31.86 13.13 34.29C13.61 34.77 14.39 34.77 14.87 34.29C17.3 31.86 26 22.56 26 13.5C26 6.87 20.63 1.5 14 1.5Z"
-          fill="url(#beerFinderPinGradient)"
-          stroke="${isSelected ? "#991b1b" : "#177e4b"}"
-          stroke-width="1"
+      <div style="
+        width:${size}px;
+        height:${size}px;
+        border-radius:999px;
+        background:rgba(255,255,255,0.96);
+        border:4px solid rgba(255,255,255,0.96);
+        box-shadow:0 0 0 7px rgba(52, 201, 121, 0.18), 0 10px 18px rgba(15,23,42,0.18);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        transform:${isSelected ? "scale(1.05)" : "scale(1)"};
+      ">
+        <img
+          src="${BEER_FINDER_MOBILE_ICON_SRC}"
+          alt=""
+          style="display:block;width:${isSelected ? 30 : 26}px;height:${isSelected ? 30 : 26}px;object-fit:contain;"
         />
-        <circle cx="14" cy="13.5" r="${isSelected ? 5.2 : 4.6}" fill="${isSelected ? "#7f1d1d" : "#157f49"}" />
-      </svg>
+      </div>
     `,
-    iconSize: [width, height],
-    iconAnchor: [width / 2, height - 1],
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
   })
 }
 
@@ -1403,6 +1394,26 @@ function BeerFinderExplorerInner({
     })
   }, [currentLocation, prioritizedMapLocation, visibleLocations])
 
+  useEffect(() => {
+    const desktopBreakpoint = window.matchMedia("(min-width: 1024px)")
+
+    const applyScrollLock = () => {
+      const shouldLock = desktopBreakpoint.matches
+
+      document.documentElement.style.overflow = shouldLock ? "hidden" : ""
+      document.body.style.overflow = shouldLock ? "hidden" : ""
+    }
+
+    applyScrollLock()
+    desktopBreakpoint.addEventListener("change", applyScrollLock)
+
+    return () => {
+      desktopBreakpoint.removeEventListener("change", applyScrollLock)
+      document.documentElement.style.overflow = ""
+      document.body.style.overflow = ""
+    }
+  }, [])
+
   return (
     <>
       <Script
@@ -1414,15 +1425,11 @@ function BeerFinderExplorerInner({
         onReady={() => setLeafletReady(true)}
       />
 
-      <section className="relative overflow-hidden px-7 pt-6 pb-10 sm:px-8 md:pt-8 md:pb-12 lg:px-10">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundImage: BEER_FINDER_PAGE_BACKDROP }}
-        />
-        <div className="relative z-10 mx-auto max-w-[1500px]">
-          <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,720px)_minmax(380px,1fr)] lg:gap-6">
-            <div className="flex flex-col gap-4 lg:w-[720px]">
-              <section className="relative h-[420px] overflow-hidden rounded-[24px] border border-black/10 bg-[#dfe6ee] sm:h-[520px] lg:h-[580px]">
+      <section className="relative overflow-hidden px-7 pt-6 pb-10 sm:px-8 md:pt-8 md:pb-12 lg:h-[calc(100dvh-4.75rem)] lg:px-0 lg:py-0 lg:overflow-hidden">
+        <div className="relative z-10 mx-auto max-w-[1500px] lg:h-full lg:max-w-none">
+          <div className="grid items-start gap-5 lg:h-full lg:grid-cols-2 lg:gap-0">
+            <div className="flex flex-col gap-4 lg:h-full lg:min-h-0 lg:w-full">
+              <section className="relative h-[420px] overflow-hidden rounded-[24px] border border-black/10 bg-[#dfe6ee] sm:h-[520px] lg:h-full lg:rounded-none lg:border-0 lg:border-r lg:border-black/10 lg:bg-transparent">
                 <div
                   ref={mapRef}
                   className="beer-finder-map absolute inset-0 z-0"
@@ -1530,7 +1537,7 @@ function BeerFinderExplorerInner({
 	              </section>
 	            </div>
 
-            <aside className="relative flex min-h-[420px] flex-col overflow-hidden rounded-[24px] border border-black/10 bg-white lg:h-[580px] lg:min-h-[580px]">
+            <aside className="relative flex min-h-[420px] flex-col overflow-hidden rounded-[24px] border border-black/10 bg-white lg:h-full lg:min-h-0 lg:rounded-none lg:border-0 lg:bg-transparent">
               <div className="shrink-0 border-b border-black/10 px-6 py-3 sm:px-8 sm:py-4">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-3">

@@ -476,6 +476,8 @@ function MobileBeerFinderLocationCard({
   const displayAddress = formatMobileAddress(location.address)
   const mapsUrl = buildMobileMapsUrl(location, mapProvider)
   const mapsLabel = mapProvider === "apple" ? "Open business listing in Apple Maps" : "Open business listing in Google Maps"
+  const [isBeerListOpen, setIsBeerListOpen] = useState(false)
+  const beersToShow = matchingBeers.length > 0 ? matchingBeers : location.beers
 
   return (
     <article className="overflow-hidden rounded-[24px] border border-black/10 bg-white/88 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
@@ -488,18 +490,47 @@ function MobileBeerFinderLocationCard({
           <p className="mt-2 text-sm leading-6 text-black/68">{displayAddress ?? "Address unavailable"}</p>
 
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/44">
               {location.customerType ?? "Retailer"}
-            </span>
-            <span className="inline-flex items-center rounded-full border border-black/10 bg-black/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
-              {beerLabel}
             </span>
           </div>
 
-          {matchingBeers.length > 0 ? (
-            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-black/46">
-              Matching beers: {matchingBeers.join(", ")}
-            </p>
+          {beersToShow.length > 0 ? (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => setIsBeerListOpen((currentValue) => !currentValue)}
+                aria-expanded={isBeerListOpen}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/0 bg-black/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/62 transition hover:bg-black/[0.06] hover:text-black"
+              >
+                <span>{beerLabel}</span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className={`h-3.5 w-3.5 fill-none stroke-current stroke-[1.8] transition-transform ${
+                    isBeerListOpen ? "rotate-180" : ""
+                  }`}
+                >
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+
+              {isBeerListOpen ? (
+                <div className="mt-2 rounded-[18px] bg-black/[0.03] px-3 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/42">Beer names</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {beersToShow.map((beerName) => (
+                      <span
+                        key={beerName}
+                        className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium leading-none text-black/78 shadow-[0_1px_0_rgba(15,23,42,0.04)]"
+                      >
+                        {beerName}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           ) : (
             <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-black/46">
               Last seen {formatDate(location.lastSeenDate)}

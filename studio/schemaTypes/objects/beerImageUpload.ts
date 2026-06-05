@@ -21,6 +21,12 @@ export const beerImageUpload = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'alt',
+      title: 'Alt Text',
+      type: 'string',
+      description: 'Describe this image for accessibility and search.',
+    }),
+    defineField({
       name: 'imageType',
       title: 'Image Type',
       type: 'string',
@@ -32,4 +38,25 @@ export const beerImageUpload = defineType({
       validation: (Rule) => Rule.required(),
     }),
   ],
+  preview: {
+    select: {
+      imageType: 'imageType',
+      alt: 'alt',
+    },
+    prepare({imageType, alt}) {
+      const typeLabel =
+        imageType === 'mainDesktop'
+          ? 'Main desktop image'
+          : imageType === 'desktopHoverMobile'
+            ? 'Desktop hover / main mobile image'
+            : imageType === 'gallery'
+              ? 'Gallery image'
+              : 'Beer image'
+
+      return {
+        title: typeLabel,
+        subtitle: alt || 'No alt text yet',
+      }
+    },
+  },
 })

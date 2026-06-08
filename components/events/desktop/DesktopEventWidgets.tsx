@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import type { EventItem } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import Button from "@/components/ui/Button"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
 import type { KeyboardEvent, MouseEvent } from "react"

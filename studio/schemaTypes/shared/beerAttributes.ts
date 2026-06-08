@@ -3,15 +3,18 @@ export type BeerAttributeOption = {
   value: string
 }
 
-export type BeerFilterGroupKey =
-  | "availability"
-  | "packaging"
+export type BeerAttributeGroupKey =
   | "appearanceSelections"
   | "maltCharacter"
   | "hopCharacter"
   | "yeastAndFermentation"
   | "bodyAndFeel"
   | "overallProfile"
+
+export type BeerFilterGroupKey =
+  | "availability"
+  | "packaging"
+  | BeerAttributeGroupKey
 
 export type BeerFilterSelections = Partial<Record<BeerFilterGroupKey, string[]>>
 
@@ -21,6 +24,8 @@ export type BeerFilterGroup = {
   description: string
   options: readonly BeerAttributeOption[]
 }
+
+export type BeerAttributeLibrary = Partial<Record<BeerAttributeGroupKey, string[]>>
 
 export const beerAvailabilityOptions: BeerAttributeOption[] = [
   { title: "Year-round", value: "yearRound" },
@@ -157,6 +162,105 @@ export const beerFilterGroups: BeerFilterGroup[] = [
   },
   ...beerAttributeGroups,
 ]
+
+export function formatBeerAttributeTitle(value: string) {
+  const normalizedValue = value
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/\s+/g, " ")
+
+  if (!normalizedValue) {
+    return ""
+  }
+
+  return normalizedValue
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ")
+}
+
+export function normalizeBeerAttributeValue(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return ""
+  }
+
+  const parts = trimmed
+    .replace(/[_-]+/g, " ")
+    .split(/\s+/)
+    .filter((part) => part.length > 0)
+
+  if (!parts.length) {
+    return ""
+  }
+
+  return parts
+    .map((part, index) => {
+      const lower = part.toLowerCase()
+      if (index === 0) {
+        return lower
+      }
+
+      return lower.charAt(0).toUpperCase() + lower.slice(1)
+    })
+    .join("")
+}
+
+function dedupeBeerAttributeOptions(options: readonly BeerAttributeOption[]) {
+  const seen = new Set<string>()
+
+  return options.filter((option) => {
+    if (seen.has(option.value)) {
+      return false
+    }
+
+    seen.add(option.value)
+    return true
+  })
+}
+
+export function mergeBeerAttributeOptions(
+  defaultOptions: readonly BeerAttributeOption[],
+  customValues: readonly string[] | undefined,
+) {
+  const customOptions = (customValues ?? [])
+    .map((value) => normalizeBeerAttributeValue(value))
+    .filter((value): value is string => value.length > 0)
+    .filter((value, index, values) => values.indexOf(value) === index)
+    .map((value) => ({
+      title: formatBeerAttributeTitle(value),
+      value,
+    }))
+
+  return dedupeBeerAttributeOptions([...defaultOptions, ...customOptions])
+}
+
+export function buildBeerAttributeGroups(customAttributes?: BeerAttributeLibrary) {
+  return beerAttributeGroups.map((group) => ({
+    ...group,
+    options: mergeBeerAttributeOptions(
+      group.options,
+      customAttributes?.[group.key as BeerAttributeGroupKey],
+    ),
+  }))
+}
+
+export function buildBeerFilterGroups(customAttributes?: BeerAttributeLibrary) {
+  return beerFilterGroups.map((group) => {
+    if (group.key === "availability" || group.key === "packaging") {
+      return group
+    }
+
+    return {
+      ...group,
+      options: mergeBeerAttributeOptions(
+        group.options,
+        customAttributes?.[group.key as BeerAttributeGroupKey],
+      ),
+    }
+  })
+}
 
 export function createEmptyBeerFilterSelections(): BeerFilterSelections {
   return {

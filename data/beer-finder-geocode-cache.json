@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-09T02:52:37.260Z",
+  "updatedAt": "2026-06-08T02:13:08.689Z",
   "entries": {
     "2016631:55-massachusetts-avenue-lexington-02420-united-states-of-america": {
       "customerId": 2016631,
@@ -1079,6 +1079,248 @@
       "provider": "census",
       "query": "100 Independence Way, Danvers, 01923, United States of America",
       "updatedAt": "2026-04-09T02:52:37.260Z"
+    },
+    "2301648:700-massachusetts-ave-arlington-ma-02476": {
+      "customerId": 2301648,
+      "name": "Arlington Libraries Foundation",
+      "address": "700 Massachusetts Ave, Arlington, MA, 02476",
+      "latitude": 42.416041662269,
+      "longitude": -71.155509477709,
+      "matchedAddress": "700 MASSACHUSETTS AVE, ARLINGTON, MA, 02476",
+      "provider": "census",
+      "query": "700 Massachusetts Ave, Arlington, MA, 02476",
+      "updatedAt": "2026-06-08T02:13:03.969Z"
+    },
+    "2294008:united-states-of-america": {
+      "customerId": 2294008,
+      "name": "Cambridge Savings Bank",
+      "address": "United States of America",
+      "latitude": 39.7837304,
+      "longitude": -100.445882,
+      "matchedAddress": "United States",
+      "provider": "nominatim",
+      "query": "United States of America",
+      "updatedAt": "2026-06-08T02:13:05.075Z"
+    },
+    "2301255:262-friend-st-boston-ma-02114": {
+      "customerId": 2301255,
+      "name": "The Greatest Bar",
+      "address": "262 Friend St, Boston, MA, 02114",
+      "latitude": 42.364683993241,
+      "longitude": -71.061364675189,
+      "matchedAddress": "262 FRIEND ST, BOSTON, MA, 02114",
+      "provider": "census",
+      "query": "262 Friend St, Boston, MA, 02114",
+      "updatedAt": "2026-06-08T02:13:05.196Z"
+    },
+    "2095681:3850-mystic-valley-parkway-medford-ma-02155": {
+      "customerId": 2095681,
+      "name": "Wegmans - Medford",
+      "address": "3850 Mystic Valley Parkway, Medford, MA, 02155",
+      "latitude": 42.404900495406,
+      "longitude": -71.091902430495,
+      "matchedAddress": "3850 MYSTIC VALLEY PKWY, MEDFORD, MA, 02155",
+      "provider": "census",
+      "query": "3850 Mystic Valley Parkway, Medford, MA, 02155",
+      "updatedAt": "2026-06-08T02:13:05.329Z"
+    },
+    "2301674:169-university-ave-westwood-ma-02090": {
+      "customerId": 2301674,
+      "name": "Wegmans - Westwood",
+      "address": "169 University Ave, Westwood, MA, 02090",
+      "latitude": 42.204826165459,
+      "longitude": -71.153054473646,
+      "matchedAddress": "169 UNIVERSITY AVE, WESTWOOD, MA, 02090",
+      "provider": "census",
+      "query": "169 University Ave, Westwood, MA, 02090",
+      "updatedAt": "2026-06-08T02:13:05.458Z"
+    },
+    "2301029:90-pleasant-valley-st-methuen-ma-01844": {
+      "customerId": 2301029,
+      "name": "One Stop Liquors - Methuen",
+      "address": "90 Pleasant Valley St, Methuen, MA, 01844",
+      "latitude": 42.732849470265,
+      "longitude": -71.179316636517,
+      "matchedAddress": "90 PLEASANT VALLEY ST, METHUEN, MA, 01844",
+      "provider": "census",
+      "query": "90 Pleasant Valley St, Methuen, MA, 01844",
+      "updatedAt": "2026-06-08T02:13:05.590Z"
+    },
+    "2301027:1900-main-st-tewksbury-ma-01876": {
+      "customerId": 2301027,
+      "name": "One Stop Liquors - Tewksbury",
+      "address": "1900 Main St, Tewksbury, MA, 01876",
+      "latitude": 42.590952773576,
+      "longitude": -71.205304057686,
+      "matchedAddress": "1900 MAIN ST, TEWKSBURY, MA, 01876",
+      "provider": "census",
+      "query": "1900 Main St, Tewksbury, MA, 01876",
+      "updatedAt": "2026-06-08T02:13:05.720Z"
+    },
+    "2016703:45-day-street-somerville-02144-united-states-of-america": {
+      "customerId": 2016703,
+      "name": "Saccos American Flatbread",
+      "address": "45 Day Street, Somerville, 02144, United States of America",
+      "latitude": 42.395236872032,
+      "longitude": -71.124333861326,
+      "matchedAddress": "45 DAY ST, SOMERVILLE, MA, 02144",
+      "provider": "census",
+      "query": "45 Day Street, Somerville, 02144, United States of America",
+      "updatedAt": "2026-06-08T02:13:05.844Z"
+    },
+    "2299951:89-main-st-andover-ma-01810": {
+      "customerId": 2299951,
+      "name": "Village Square Liquors",
+      "address": "89 Main St, Andover, MA, 01810",
+      "latitude": 42.653861765821,
+      "longitude": -71.138830485538,
+      "matchedAddress": "89 MAIN ST, ANDOVER, MA, 01810",
+      "provider": "census",
+      "query": "89 Main St, Andover, MA, 01810",
+      "updatedAt": "2026-06-08T02:13:05.975Z"
+    },
+    "2158598:890-commonwealth-ave-3rd-floor-boston-ma-02215": {
+      "customerId": 2158598,
+      "name": "WBUR",
+      "address": "890 Commonwealth Ave 3rd Floor, Boston, MA, 02215",
+      "latitude": 42.350864454495,
+      "longitude": -71.115017840671,
+      "matchedAddress": "890 COMMONWEALTH AVE, BOSTON, MA, 02215",
+      "provider": "census",
+      "query": "890 Commonwealth Ave 3rd Floor, Boston, MA, 02215",
+      "updatedAt": "2026-06-08T02:13:06.106Z"
+    },
+    "2016731:468-mystic-street-winchester-01890-united-states-of-america": {
+      "customerId": 2016731,
+      "name": "Winchester Country Club",
+      "address": "468 Mystic Street, Winchester, 01890, United States of America",
+      "latitude": 42.43826,
+      "longitude": -71.1637487,
+      "matchedAddress": "Winchester Country Club, 468, Mystic Street, Winchester, Middlesex County, Massachusetts, 01890, United States",
+      "provider": "nominatim",
+      "query": "468 Mystic Street, Winchester, 01890, United States of America",
+      "updatedAt": "2026-06-08T02:13:07.267Z"
+    },
+    "2283351:118-beacon-st-somerville-ma-02143": {
+      "customerId": 2283351,
+      "name": "Cafe St Germain",
+      "address": "118 Beacon St, Somerville, MA, 02143",
+      "latitude": 42.377563257658,
+      "longitude": -71.105612192522,
+      "matchedAddress": "118 BEACON ST, SOMERVILLE, MA, 02143",
+      "provider": "census",
+      "query": "118 Beacon St, Somerville, MA, 02143",
+      "updatedAt": "2026-06-08T02:13:07.395Z"
+    },
+    "2293951:293-elm-st-braintree-ma-02184": {
+      "customerId": 2293951,
+      "name": "Kay’s Cans & Bottles",
+      "address": "293 Elm St, Braintree, MA, 02184",
+      "latitude": 42.224230207632,
+      "longitude": -70.996965570239,
+      "matchedAddress": "293 ELM ST, BRAINTREE, MA, 02184",
+      "provider": "census",
+      "query": "293 Elm St, Braintree, MA, 02184",
+      "updatedAt": "2026-06-08T02:13:07.514Z"
+    },
+    "2023958:186-bedford-st-lexington-ma-02420": {
+      "customerId": 2023958,
+      "name": "Lexington wine & spirits",
+      "address": "186 Bedford St, Lexington, MA, 02420",
+      "latitude": 42.459765470057,
+      "longitude": -71.238465559784,
+      "matchedAddress": "186 BEDFORD ST, LEXINGTON, MA, 02420",
+      "provider": "census",
+      "query": "186 Bedford St, Lexington, MA, 02420",
+      "updatedAt": "2026-06-08T02:13:07.633Z"
+    },
+    "2290922:200-homer-ave-ashland-ma-01721": {
+      "customerId": 2290922,
+      "name": "Clock Tower Pickle Ball",
+      "address": "200 Homer Ave, Ashland, MA, 01721",
+      "latitude": 42.2587077289,
+      "longitude": -71.456994431322,
+      "matchedAddress": "200 HOMER AVE, ASHLAND, MA, 01721",
+      "provider": "census",
+      "query": "200 Homer Ave, Ashland, MA, 01721",
+      "updatedAt": "2026-06-08T02:13:07.755Z"
+    },
+    "2016728:1216-main-street-concord-01742-united-states-of-america": {
+      "customerId": 2016728,
+      "name": "West Concord Wine and Spirits",
+      "address": "1216 Main Street, Concord, 01742, United States of America",
+      "latitude": 42.456537091862,
+      "longitude": -71.391675247296,
+      "matchedAddress": "1216 MAIN ST, CONCORD, MA, 01742",
+      "provider": "census",
+      "query": "1216 Main Street, Concord, 01742, United States of America",
+      "updatedAt": "2026-06-08T02:13:07.887Z"
+    },
+    "2290135:500-harrison-ave-boston-ma-02118": {
+      "customerId": 2290135,
+      "name": "Sowa Open Market",
+      "address": "500 Harrison Ave, Boston, MA, 02118",
+      "latitude": 42.342057377686,
+      "longitude": -71.066046670477,
+      "matchedAddress": "500 HARRISON AVE, BOSTON, MA, 02118",
+      "provider": "census",
+      "query": "500 Harrison Ave, Boston, MA, 02118",
+      "updatedAt": "2026-06-08T02:13:08.009Z"
+    },
+    "2016647:11-waterfield-rd-winchester-ma-01890": {
+      "customerId": 2016647,
+      "name": "D'Agostino's Winchester",
+      "address": "11 Waterfield Rd, Winchester, MA, 01890",
+      "latitude": 42.451318441715,
+      "longitude": -71.137751741994,
+      "matchedAddress": "11 WATERFIELD RD, WINCHESTER, MA, 01890",
+      "provider": "census",
+      "query": "11 Waterfield Rd, Winchester, MA, 01890",
+      "updatedAt": "2026-06-08T02:13:08.144Z"
+    },
+    "2280446:525-harvard-st-site-b-brookline-ma-02446": {
+      "customerId": 2280446,
+      "name": "Mall Discount Liquors",
+      "address": "525 Harvard St, Site B, Brookline, MA, 02446",
+      "latitude": 42.348099847214,
+      "longitude": -71.129182867714,
+      "matchedAddress": "525 HARVARD ST, BROOKLINE, MA, 02446",
+      "provider": "census",
+      "query": "525 Harvard St, Site B, Brookline, MA, 02446",
+      "updatedAt": "2026-06-08T02:13:08.282Z"
+    },
+    "2016626:134-massachusetts-avenue-arlington-02474-united-states-of-america": {
+      "customerId": 2016626,
+      "name": "Arlington Restaurant & Diner",
+      "address": "134 Massachusetts Avenue, Arlington, 02474, United States of America",
+      "latitude": 42.404085300451,
+      "longitude": -71.140239924434,
+      "matchedAddress": "134 MASSACHUSETTS AVE, ARLINGTON, MA, 02474",
+      "provider": "census",
+      "query": "134 Massachusetts Avenue, Arlington, 02474, United States of America",
+      "updatedAt": "2026-06-08T02:13:08.422Z"
+    },
+    "2277997:265-main-st-north-reading-ma-01864": {
+      "customerId": 2277997,
+      "name": "One Stop Liquors - N. Reading",
+      "address": "265 Main St, North Reading, MA, 01864",
+      "latitude": 42.591395533681,
+      "longitude": -71.117473558206,
+      "matchedAddress": "265 MAIN ST, NORTH READING, MA, 01864",
+      "provider": "census",
+      "query": "265 Main St, North Reading, MA, 01864",
+      "updatedAt": "2026-06-08T02:13:08.551Z"
+    },
+    "2029164:5-playstead-road-medford-ma-02155": {
+      "customerId": 2029164,
+      "name": "Bistro 5",
+      "address": "5 Playstead Road, Medford, MA, 02155",
+      "latitude": 42.421417620609,
+      "longitude": -71.132546345988,
+      "matchedAddress": "5 PLAYSTEAD RD, MEDFORD, MA, 02155",
+      "provider": "census",
+      "query": "5 Playstead Road, Medford, MA, 02155",
+      "updatedAt": "2026-06-08T02:13:08.689Z"
     }
   }
 }

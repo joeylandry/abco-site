@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 import BeerDetailView from "@/components/beer/BeerDetailView"
 import { getRelatedBeers } from "@/app/beer/mockBeers"
 import { getSanityBeerBySlug } from "@/lib/sanityBeers"
+import { buildBeerAttributeGroups } from "@/studio/schemaTypes/shared/beerAttributes"
+import { getBeerAttributeLibrary } from "@/lib/sanityBeerAttributes"
 
 export const dynamic = "force-dynamic"
 
@@ -32,12 +34,16 @@ export async function generateMetadata({
 
 export default async function BeerDetailPage({ params }: BeerDetailPageProps) {
   const { id } = await params
-  const beer = await getSanityBeerBySlug(id)
+  const [beer, beerAttributeLibrary] = await Promise.all([
+    getSanityBeerBySlug(id),
+    getBeerAttributeLibrary(),
+  ])
 
   if (!beer) {
     notFound()
   }
 
   const relatedBeers = getRelatedBeers(beer.id, 8)
-  return <BeerDetailView beer={beer} relatedBeers={relatedBeers} />
+  const beerAttributeGroups = buildBeerAttributeGroups(beerAttributeLibrary)
+  return <BeerDetailView beer={beer} relatedBeers={relatedBeers} beerAttributeGroups={beerAttributeGroups} />
 }

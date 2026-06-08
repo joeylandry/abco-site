@@ -4,7 +4,7 @@ import { createPortal } from "react-dom"
 import { flushSync } from "react-dom"
 import { useEffect, useRef, useState } from "react"
 import clsx from "clsx"
-import { upcomingEvents } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
 import MobileDrawerHeader from "@/components/layout/MobileDrawerHeader"
 import { MobileCalendarGridCard } from "@/components/events/mobile/MobileEventWidgets"
@@ -26,11 +26,13 @@ function ArrowIcon() {
 type AllUpcomingEventsDrawerProps = {
   className?: string
   triggerLabel?: string
+  events: EventItem[]
 }
 
 export default function AllUpcomingEventsDrawer({
   className,
   triggerLabel = "View all events",
+  events,
 }: AllUpcomingEventsDrawerProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isDrawerRendered, setIsDrawerRendered] = useState(false)
@@ -243,7 +245,7 @@ export default function AllUpcomingEventsDrawer({
 
                 <div className="px-4 pb-6 pt-4">
                   <div className="grid grid-cols-2 gap-3">
-                    {upcomingEvents.map((event, index) => (
+                    {events.map((event, index) => (
                       <MobileCalendarGridCard
                         key={event.id}
                         event={event}

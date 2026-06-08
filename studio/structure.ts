@@ -13,6 +13,7 @@ const singletonTypes = new Set([
   'contactPage',
   'jobsPage',
   'bookEventPage',
+  'beerAttributeLibrary',
 ])
 
 const singletonDocuments = [
@@ -23,11 +24,13 @@ const singletonDocuments = [
   {id: 'contactPage', title: 'Contact Page', schemaType: 'contactPage'},
   {id: 'jobsPage', title: 'Jobs Page', schemaType: 'jobsPage'},
   {id: 'bookEventPage', title: 'Book an Event Page', schemaType: 'bookEventPage'},
+  {id: 'beerAttributeLibrary', title: 'Beer Attribute Library', schemaType: 'beerAttributeLibrary'},
 ] as const
 
 const collectionDocuments = [
   {title: 'Beers', schemaType: 'beer'},
   {title: 'Events', schemaType: 'event'},
+  {title: 'Locations', schemaType: 'eventLocation'},
   {title: 'Announcements', schemaType: 'announcement'},
   {title: 'Team Members', schemaType: 'teamMember'},
   {title: 'Job Openings', schemaType: 'jobOpening'},

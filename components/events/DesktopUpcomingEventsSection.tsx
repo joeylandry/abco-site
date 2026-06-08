@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import type { EventItem } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { DesktopCalendarGridCard } from "@/components/events/desktop/DesktopEventWidgets"
 import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
 

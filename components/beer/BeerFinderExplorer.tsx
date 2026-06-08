@@ -3,7 +3,17 @@
 import Image from "next/image"
 import Script from "next/script"
 import { useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type MutableRefObject } from "react"
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type MutableRefObject,
+} from "react"
 import { mockBeers } from "@/app/beer/mockBeers"
 import type { BeerFinderLocation } from "@/lib/breww"
 import { BEER_FINDER_MOBILE_ICON_SRC } from "@/components/beer/mobileBeerArtwork"
@@ -20,7 +30,6 @@ type BeerFinderExplorerProps = {
   locations: BeerFinderLocation[]
   initialSelectedBeers: string[]
   initialZip: string | null
-  initialUseCurrentLocation?: boolean
 }
 
 type CurrentLocation = {
@@ -88,6 +97,11 @@ const DEFAULT_CENTER = {
   latitude: 42.3876,
   longitude: -71.1437,
 }
+
+const MAP_MAX_BOUNDS: [[number, number], [number, number]] = [
+  [41.05, -74.65],
+  [43.35, -69.1],
+]
 
 const MAP_MIN_ZOOM = 8
 const MAP_MAX_ZOOM = 17
@@ -529,7 +543,6 @@ function BeerFinderExplorerInner({
   locations,
   initialSelectedBeers,
   initialZip,
-  initialUseCurrentLocation = false,
 }: BeerFinderExplorerProps) {
   const [leafletReady, setLeafletReady] = useState(false)
   const [showMapZoomHint, setShowMapZoomHint] = useState(false)
@@ -585,8 +598,6 @@ function BeerFinderExplorerInner({
   const ignoreNextMapMoveEndRef = useRef(true)
   const zoomHintTimeoutRef = useRef<number | null>(null)
   const zoomHintLastShownAtRef = useRef(0)
-  const hasAutoUsedCurrentLocationRef = useRef(false)
-  const autoUseCurrentLocationTimeoutRef = useRef<number | null>(null)
   const useAppleCommandIcon = isApplePlatform()
 
   useEffect(() => {
@@ -962,25 +973,6 @@ function BeerFinderExplorerInner({
     suppressAutoRecenterRef.current = false
   }, [])
 
-  useEffect(() => {
-    if (!initialUseCurrentLocation || hasAutoUsedCurrentLocationRef.current || currentLocation || isLocatingCurrentLocation) {
-      return
-    }
-
-    hasAutoUsedCurrentLocationRef.current = true
-
-    autoUseCurrentLocationTimeoutRef.current = window.setTimeout(() => {
-      handleUseCurrentLocation()
-    }, 0)
-
-    return () => {
-      if (autoUseCurrentLocationTimeoutRef.current !== null) {
-        window.clearTimeout(autoUseCurrentLocationTimeoutRef.current)
-        autoUseCurrentLocationTimeoutRef.current = null
-      }
-    }
-  }, [currentLocation, handleUseCurrentLocation, initialUseCurrentLocation, isLocatingCurrentLocation])
-
   function toggleBeerFilter(beerName: string) {
     setSelectedLocationId(null)
     setSelectedBeerFilters((currentFilters) =>
@@ -1103,6 +1095,8 @@ function BeerFinderExplorerInner({
       wheelDebounceTime: 0,
       minZoom: MAP_MIN_ZOOM,
       maxZoom: MAP_MAX_ZOOM,
+      maxBounds: MAP_MAX_BOUNDS,
+      maxBoundsViscosity: 1,
       inertia: true,
       preferCanvas: true,
     }).setView([DEFAULT_CENTER.latitude, DEFAULT_CENTER.longitude], 10.5)
@@ -2054,9 +2048,10 @@ export default function BeerFinderExplorer(props: BeerFinderExplorerProps) {
   const searchParams = useSearchParams()
   const deepLinkedBeerParams = searchParams.getAll("beer").map((value) => value.trim()).filter(Boolean)
   const deepLinkedZipParam = searchParams.get("zip")
-  const deepLinkedNearParam = searchParams.get("near")
 
-  useEffect(() => {
+  const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect
+
+  useIsomorphicLayoutEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)")
 
     const updateViewportMatch = () => {
@@ -2103,15 +2098,6 @@ export default function BeerFinderExplorer(props: BeerFinderExplorerProps) {
     return isCompleteZipCode(trimmedZip) ? trimmedZip : null
   }, [deepLinkedZipParam])
 
-  const deepLinkedNear = useMemo(() => {
-    if (!deepLinkedNearParam) {
-      return false
-    }
-
-    const normalized = deepLinkedNearParam.trim().toLowerCase()
-    return normalized === "1" || normalized === "true"
-  }, [deepLinkedNearParam])
-
   const effectiveInitialSelectedBeers = deepLinkedBeerNames ?? props.initialSelectedBeers
   const effectiveInitialZip = deepLinkedZip ?? props.initialZip
   const remountKey = `${effectiveInitialZip ?? "nozip"}|${effectiveInitialSelectedBeers.join("\u0000") || "all"}`
@@ -2126,7 +2112,6 @@ export default function BeerFinderExplorer(props: BeerFinderExplorerProps) {
       {...props}
       initialSelectedBeers={effectiveInitialSelectedBeers}
       initialZip={effectiveInitialZip}
-      initialUseCurrentLocation={deepLinkedNear || Boolean(props.initialUseCurrentLocation)}
     />
   )
 }

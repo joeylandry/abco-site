@@ -98,17 +98,13 @@ export const event = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'locationName',
-      title: 'Location Name',
-      type: 'string',
+      name: 'location',
+      title: 'Location',
+      type: 'reference',
       group: 'details',
-    }),
-    defineField({
-      name: 'locationAddress',
-      title: 'Location Address',
-      type: 'text',
-      rows: 3,
-      group: 'details',
+      to: [{type: 'eventLocation'}],
+      description: 'Pick a reusable location or create a new one for this event.',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'ageRestriction',
@@ -175,7 +171,8 @@ export const event = defineType({
       title: 'Status',
       type: 'string',
       group: 'details',
-      description: 'Use Active for events that should appear publicly and Archived for old events.',
+      description:
+        'Editorial status for the CMS. The site still classifies events automatically by date and time.',
       options: {
         list: [
           {title: 'Active', value: 'active'},
@@ -199,8 +196,9 @@ export const event = defineType({
       status: 'status',
       featured: 'featured',
       startDateTime: 'startDateTime',
+      locationName: 'location->name',
     },
-    prepare({title, status, featured, startDateTime}) {
+    prepare({title, status, featured, startDateTime, locationName}) {
       const pieces = [status || 'active']
 
       if (featured) {
@@ -213,7 +211,7 @@ export const event = defineType({
 
       return {
         title: title || 'Event',
-        subtitle: pieces.join(' • '),
+        subtitle: [locationName || 'No location', pieces.join(' • ')].filter(Boolean).join(' • '),
       }
     },
   },

@@ -10,12 +10,17 @@ import EventTag from "@/components/events/EventTag"
 import DesktopUpcomingEventsSection from "@/components/events/DesktopUpcomingEventsSection"
 import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
-import { pastEvents, upcomingEvents } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
+
+type EventsPageContentProps = {
+  upcomingEvents: EventItem[]
+  pastEvents: EventItem[]
+}
 
 const CLEAR_EVENT_BUTTON_CLASS =
   "border border-black bg-transparent text-black shadow-none hover:bg-black/5 hover:text-black"
 
-export default function EventsPageContent() {
+export default function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageContentProps) {
   const router = useRouter()
   const [showInHouseOnly, setShowInHouseOnly] = useState(false)
   const filteredUpcomingEvents = useMemo(

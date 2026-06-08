@@ -3,7 +3,9 @@ import {announcement} from './documents/announcement'
 import {bookEventPage} from './documents/bookEventPage'
 import {contactPage} from './documents/contactPage'
 import {event} from './documents/event'
+import {eventLocation} from './documents/eventLocation'
 import {beer} from './documents/beer'
+import {beerAttributeLibrary} from './documents/beerAttributeLibrary'
 import {homePage} from './documents/homePage'
 import {jobOpening} from './documents/jobOpening'
 import {jobsPage} from './documents/jobsPage'
@@ -38,6 +40,7 @@ export const schemaTypes = [
   announcement,
   announcementBlock,
   beer,
+  beerAttributeLibrary,
   beerImageUpload,
   beerLegacyImageWithAlt,
   beerFinderPromoBlock,
@@ -48,6 +51,7 @@ export const schemaTypes = [
   contactPage,
   docuseriesEpisode,
   event,
+  eventLocation,
   galleryImage,
   hoursLine,
   heroBlock,

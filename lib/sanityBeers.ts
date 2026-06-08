@@ -215,9 +215,6 @@ function normalizeBeer(doc: SanityBeerDoc): Beer {
     beerImages.find((image) => image.imageType === "desktopHoverMobile")?.url,
     doc.hoverImage?.url,
     doc.secondaryImage?.url,
-    galleryImages.find((url) => url !== primaryImage),
-    galleryImages[1],
-    primaryImage,
   )
 
   const detailImages = Array.from(

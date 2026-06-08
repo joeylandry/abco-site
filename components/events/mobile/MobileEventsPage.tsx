@@ -1,12 +1,16 @@
 "use client"
 
-import { upcomingEvents } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { MobileEventWidget } from "@/components/events/mobile/MobileEventWidgets"
 import AllUpcomingEventsDrawer from "@/components/events/mobile/AllUpcomingEventsDrawer"
 
-const featuredMobileEvents = upcomingEvents.slice(0, 3)
+type MobileEventsPageProps = {
+  upcomingEvents: EventItem[]
+}
 
-export default function MobileEventsPage() {
+export default function MobileEventsPage({ upcomingEvents }: MobileEventsPageProps) {
+  const featuredMobileEvents = upcomingEvents.slice(0, 3)
+
   return (
     <>
       <section className="bg-background text-foreground md:hidden">
@@ -24,7 +28,7 @@ export default function MobileEventsPage() {
             ))}
           </div>
 
-          <AllUpcomingEventsDrawer className="mt-5" />
+          <AllUpcomingEventsDrawer className="mt-5" events={upcomingEvents} />
         </div>
       </section>
     </>

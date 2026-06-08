@@ -96,18 +96,17 @@ export default async function BeerFinderPage({ searchParams }: BeerFinderPagePro
           </section>
         ) : (
           <>
-            <div className="md:hidden">
-              <MobileBeerFinder
+            <div className="hidden md:block">
+              <BeerFinderExplorer
                 key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${data.generatedAt}-${data.locations.length}`}
                 locations={data.locations}
                 initialSelectedBeers={initialSelectedBeers}
                 initialZip={initialZip}
               />
             </div>
-
-            <div className="hidden md:block">
-              <BeerFinderExplorer
-                key={`${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${data.generatedAt}-${data.locations.length}`}
+            <div className="md:hidden">
+              <MobileBeerFinder
+                key={`mobile-${initialSelectedBeers.join("|") || "all"}-${initialZip ?? "nozip"}-${data.generatedAt}-${data.locations.length}`}
                 locations={data.locations}
                 initialSelectedBeers={initialSelectedBeers}
                 initialZip={initialZip}

@@ -1,4 +1,4 @@
-import type { EventItem } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 
 function escapeCalendarText(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;")

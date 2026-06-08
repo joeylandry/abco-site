@@ -478,6 +478,8 @@ function MobileBeerFinderLocationCard({
   const mapsLabel = mapProvider === "apple" ? "Open business listing in Apple Maps" : "Open business listing in Google Maps"
   const [isBeerListOpen, setIsBeerListOpen] = useState(false)
   const beersToShow = matchingBeers.length > 0 ? matchingBeers : location.beers
+  const beerNamesSummary = beersToShow.join(" • ")
+  const beerFlipHint = isBeerListOpen ? "Tap to flip back" : "Tap to flip"
 
   return (
     <article className="overflow-hidden rounded-[24px] border border-black/10 bg-white/88 shadow-[0_14px_30px_rgba(15,23,42,0.08)]">
@@ -500,36 +502,50 @@ function MobileBeerFinderLocationCard({
               <button
                 type="button"
                 onClick={() => setIsBeerListOpen((currentValue) => !currentValue)}
-                aria-expanded={isBeerListOpen}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/0 bg-black/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/62 transition hover:bg-black/[0.06] hover:text-black"
+                aria-pressed={isBeerListOpen}
+                aria-label={`${isBeerListOpen ? "Show beer count" : "Show beer names"} for ${location.name}`}
+                className="group relative block h-[4.75rem] w-[min(11.5rem,100%)] overflow-hidden rounded-[18px] border border-black/0 bg-black/[0.03] px-0 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-black/62 transition hover:bg-black/[0.06] hover:text-black"
+                style={{ perspective: "1100px" }}
               >
-                <span>{beerLabel}</span>
-                <svg
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                  className={`h-3.5 w-3.5 fill-none stroke-current stroke-[1.8] transition-transform ${
-                    isBeerListOpen ? "rotate-180" : ""
-                  }`}
+                <span
+                  className="pointer-events-none relative flex h-full w-full [transform-style:preserve-3d] transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+                  style={{
+                    transform: isBeerListOpen ? "rotateY(180deg)" : "rotateY(0deg)",
+                  }}
                 >
-                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-
-              {isBeerListOpen ? (
-                <div className="mt-2 rounded-[18px] bg-black/[0.03] px-3 py-2">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/42">Beer names</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {beersToShow.map((beerName) => (
-                      <span
-                        key={beerName}
-                        className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium leading-none text-black/78 shadow-[0_1px_0_rgba(15,23,42,0.04)]"
+                  <span
+                    className="absolute inset-0 flex h-full w-full flex-col justify-center gap-1 px-3 py-2 [backface-visibility:hidden]"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span>{beerLabel}</span>
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        className={`h-3.5 w-3.5 fill-none stroke-current stroke-[1.8] transition-transform ${
+                          isBeerListOpen ? "rotate-180" : ""
+                        }`}
                       >
-                        {beerName}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+                        <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span className="text-[9px] font-medium uppercase tracking-[0.14em] text-black/42">
+                      {beerFlipHint}
+                    </span>
+                  </span>
+
+                  <span
+                    className="absolute inset-0 flex h-full w-full flex-col justify-center gap-1 px-3 py-2 [backface-visibility:hidden]"
+                    style={{ transform: "rotateY(180deg)" }}
+                  >
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-black/42">
+                      Beer names
+                    </span>
+                    <span className="overflow-hidden text-[10px] font-medium leading-[1.2] text-black/78 [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3]">
+                      {beerNamesSummary}
+                    </span>
+                  </span>
+                </span>
+              </button>
             </div>
           ) : (
             <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-black/46">

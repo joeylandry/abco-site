@@ -3,6 +3,7 @@ type LeafletLatLngObject = {
   lat: number
   lng: number
 }
+type LeafletLatLngBounds = [[number, number], [number, number]]
 
 type LeafletMapOptions = {
   zoomControl: boolean
@@ -19,6 +20,8 @@ type LeafletMapOptions = {
   wheelDebounceTime?: number
   minZoom?: number
   maxZoom?: number
+  maxBounds?: LeafletLatLngBounds
+  maxBoundsViscosity?: number
   inertia?: boolean
   preferCanvas?: boolean
 }

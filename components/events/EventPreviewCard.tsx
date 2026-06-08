@@ -1,5 +1,5 @@
 import Link from "next/link"
-import type { EventItem } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
 
 export default function EventPreviewCard({

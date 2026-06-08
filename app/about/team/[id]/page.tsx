@@ -10,7 +10,7 @@ import {
   getTeamMemberById,
   teamMembers,
 } from "@/app/about/teamMembers"
-import { upcomingEvents } from "@/app/events/mockEvents"
+import { getEventsSnapshot } from "@/lib/events"
 import { truncateToEvenLength } from "@/lib/truncateToEvenLength"
 
 type TeamMemberDetailPageProps = {
@@ -56,6 +56,8 @@ export async function generateMetadata({
   }
 }
 
+export const dynamic = "force-dynamic"
+
 export default async function TeamMemberDetailPage({
   params,
 }: TeamMemberDetailPageProps) {
@@ -66,6 +68,7 @@ export default async function TeamMemberDetailPage({
     notFound()
   }
 
+  const { upcomingEvents } = await getEventsSnapshot()
   const upcomingAboutEvents = truncateToEvenLength(upcomingEvents.slice(0, 8))
 
   return (

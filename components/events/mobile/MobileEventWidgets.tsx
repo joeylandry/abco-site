@@ -2,7 +2,7 @@
 
 import Button from "@/components/ui/Button"
 import { useRouter } from "next/navigation"
-import type { EventItem } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
 import { buildEventCalendarFilename } from "@/lib/eventCalendar"
 import { MobileEventBadge, MobileEventDateStack } from "@/components/events/mobile/MobileEventShared"

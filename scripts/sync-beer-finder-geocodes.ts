@@ -43,6 +43,7 @@ loadEnvFile(".env")
 
 const data = await getBeerFinderData({
   maxCoordinateLookups: Number.POSITIVE_INFINITY,
+  bypassCache: true,
 })
 
 if (data.status !== "ready") {

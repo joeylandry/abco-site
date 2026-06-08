@@ -1,4 +1,4 @@
-import { getEventById } from "@/app/events/mockEvents"
+import { getEventBySlug } from "@/lib/events"
 import { buildEventCalendarFilename, buildEventCalendarIcs } from "@/lib/eventCalendar"
 
 type CalendarRouteParams = {
@@ -9,7 +9,7 @@ type CalendarRouteParams = {
 
 export async function GET(_: Request, { params }: CalendarRouteParams) {
   const { id } = await params
-  const event = getEventById(id)
+  const event = await getEventBySlug(id)
 
   if (!event) {
     return new Response("Event not found", { status: 404 })

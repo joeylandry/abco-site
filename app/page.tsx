@@ -9,6 +9,7 @@ import HomeFeaturedBeers from "@/components/home/HomeFeaturedBeers";
 import type { Metadata } from "next";
 import HomeDesktopAnnouncement from "@/components/home/HomeDesktopAnnouncement";
 import { getHomeHeroImages } from "@/lib/homeHeroImages";
+import { getEventsSnapshot } from "@/lib/events";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -17,7 +18,11 @@ export const metadata: Metadata = {
 
 const homeHeroImages = getHomeHeroImages();
 
-export default function HomePage() {
+export const dynamic = "force-dynamic"
+
+export default async function HomePage() {
+  const { nextEvent } = await getEventsSnapshot()
+
   return (
     <>
       <HomeHeroBMobile images={homeHeroImages} />
@@ -27,9 +32,9 @@ export default function HomePage() {
       <HomeDesktopAnnouncement />
       <HomeMobileAnnouncements />
       <HomeMobileBeerFinder />
-      <HomeMobileNextEvent />
+      <HomeMobileNextEvent nextEvent={nextEvent} />
       <HomeMobileBeerTeaser />
-      <HomeNextEvent />
+      <HomeNextEvent nextEvent={nextEvent} />
       <div className="hidden md:block">
         <HomeFeaturedBeers />
       </div>

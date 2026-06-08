@@ -9,10 +9,15 @@ import Button from "@/components/ui/Button"
 import { getBeerImageFrame, getBeerImageStyle } from "@/components/beer/beerImageFrame"
 import { getMobileBeerIconSrc } from "@/components/beer/mobileBeerArtwork"
 import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
-import { beerAttributeGroups } from "@/studio/schemaTypes/shared/beerAttributes"
+import {
+  formatBeerAttributeTitle,
+  type BeerFilterGroup,
+} from "@/studio/schemaTypes/shared/beerAttributes"
 
 const CLEAR_EVENT_BUTTON_CLASS =
   "border border-black bg-transparent text-black shadow-none hover:bg-black/5 hover:text-black"
+const GALLERY_NAV_BUTTON_BASE =
+  "inline-flex items-center justify-center rounded-full border border-white/70 text-white transition-colors duration-200 focus-visible:outline-white focus-visible:outline-offset-2"
 
 function formatPackaging(packaging: string[] | undefined) {
   if (!packaging?.length) {
@@ -28,12 +33,12 @@ function formatAvailability(availability: "yearRound" | "seasonal" | "rotating")
   return "Rotating"
 }
 
-function formatBeerAttributes(beer: Beer) {
-  const attributeGroups = beerAttributeGroups.filter(
+function formatBeerAttributes(beer: Beer, attributeGroups: BeerFilterGroup[]) {
+  const filteredGroups = attributeGroups.filter(
     (group) => group.key !== "availability" && group.key !== "packaging",
   )
 
-  return attributeGroups
+  return filteredGroups
     .map((group) => {
       const selectedValues = beer.filterSelections?.[group.key] ?? []
       if (selectedValues.length === 0) {
@@ -41,7 +46,7 @@ function formatBeerAttributes(beer: Beer) {
       }
 
       const selectedLabels = selectedValues.map((value) => {
-        return group.options.find((option) => option.value === value)?.title ?? value
+        return group.options.find((option) => option.value === value)?.title ?? formatBeerAttributeTitle(value)
       })
 
       return {
@@ -118,6 +123,8 @@ function GalleryArrowIcon({
   )
 }
 
+const DESKTOP_GALLERY_SLIDE_DURATION_MS = 6000
+
 function DesktopRotatingGallery({
   images,
   beerId,
@@ -134,12 +141,12 @@ function DesktopRotatingGallery({
       return
     }
 
-    const interval = window.setInterval(() => {
+    const timeout = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % images.length)
-    }, 4200)
+    }, DESKTOP_GALLERY_SLIDE_DURATION_MS)
 
-    return () => window.clearInterval(interval)
-  }, [images.length])
+    return () => window.clearTimeout(timeout)
+  }, [activeIndex, images.length])
 
   const normalizedActiveIndex = images.length === 0 ? 0 : activeIndex % images.length
 
@@ -174,40 +181,39 @@ function DesktopRotatingGallery({
 
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.06),transparent_34%,transparent_72%,rgba(15,23,42,0.26))]" />
 
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-4 px-4 py-4 text-white">
-        <div className="rounded-full bg-black/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] backdrop-blur-sm">
-          Gallery {String(activeIndex + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
-        </div>
-
-        <div className="flex items-center gap-2">
-          {images.map((_, index) => (
-            <button
-              key={`${beerName}-dot-${index}`}
-              type="button"
-              onClick={() => setActiveIndex(index)}
-              aria-label={`Show gallery image ${index + 1}`}
-              aria-pressed={index === normalizedActiveIndex}
-              className={`h-2.5 rounded-full transition-all duration-200 ${
-                index === normalizedActiveIndex ? "w-8 bg-white" : "w-2.5 bg-white/45 hover:bg-white/70"
-              }`}
-            />
-          ))}
-        </div>
-
-        <div className="flex items-center gap-1.5 rounded-full bg-black/30 px-2 py-1 backdrop-blur-sm">
+      <div className="absolute inset-x-0 bottom-4 flex justify-center px-4">
+        <div className="flex items-center gap-2 text-white">
           <button
             type="button"
             onClick={() => setActiveIndex((current) => (current - 1 + images.length) % images.length)}
             aria-label="Previous gallery image"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-white transition hover:bg-white/10"
+            className={`${GALLERY_NAV_BUTTON_BASE} h-7 w-7 bg-transparent hover:bg-white/15`}
           >
             <GalleryArrowIcon direction="left" />
           </button>
+
+          <div className="flex items-center gap-2">
+            {images.map((_, index) => (
+              <button
+                key={`${beerName}-dot-${index}`}
+                type="button"
+                onClick={() => setActiveIndex(index)}
+                aria-label={`Show gallery image ${index + 1}`}
+                aria-pressed={index === normalizedActiveIndex}
+                className={`${GALLERY_NAV_BUTTON_BASE} h-2.5 w-2.5 ${
+                  index === normalizedActiveIndex
+                    ? "bg-white"
+                    : "bg-transparent hover:bg-white/40"
+                }`}
+              />
+            ))}
+          </div>
+
           <button
             type="button"
             onClick={() => setActiveIndex((current) => (current + 1) % images.length)}
             aria-label="Next gallery image"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-white transition hover:bg-white/10"
+            className={`${GALLERY_NAV_BUTTON_BASE} h-7 w-7 bg-transparent hover:bg-white/15`}
           >
             <GalleryArrowIcon direction="right" />
           </button>
@@ -227,9 +233,10 @@ const SURFACE_BORDER_BLACK = "rgba(22, 22, 22, 0.12)"
 type BeerDetailViewProps = {
   beer: Beer
   relatedBeers: Beer[]
+  beerAttributeGroups: BeerFilterGroup[]
 }
 
-export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewProps) {
+export default function BeerDetailView({ beer, relatedBeers, beerAttributeGroups }: BeerDetailViewProps) {
   const detailImages =
     beer.detailImages && beer.detailImages.length > 0
       ? beer.detailImages
@@ -247,7 +254,7 @@ export default function BeerDetailView({ beer, relatedBeers }: BeerDetailViewPro
   const beerSpecs = [beer.abv > 0 ? `${beer.abv}% ABV` : null, beer.ibu ? `${beer.ibu} IBU` : null]
     .filter((value): value is string => value !== null)
     .join(" | ")
-  const beerAttributes = formatBeerAttributes(beer)
+  const beerAttributes = formatBeerAttributes(beer, beerAttributeGroups)
 
   return (
     <div className="bg-white">

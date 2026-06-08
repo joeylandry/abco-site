@@ -8,10 +8,10 @@ import { beerMatchesFilterSelections } from "@/app/beer/mockBeers"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
 import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
 import {
-  beerFilterGroups,
   countBeerFilterSelections,
   createEmptyBeerFilterSelections,
   toggleBeerFilterSelection,
+  type BeerFilterGroup,
   type BeerFilterGroupKey,
   type BeerFilterSelections,
 } from "@/studio/schemaTypes/shared/beerAttributes"
@@ -37,9 +37,10 @@ function FilterIcon() {
 
 type BeerCatalogProps = {
   beers: Beer[]
+  beerFilterGroups: BeerFilterGroup[]
 }
 
-export default function BeerCatalog({ beers }: BeerCatalogProps) {
+export default function BeerCatalog({ beers, beerFilterGroups }: BeerCatalogProps) {
   const [selectedFilters, setSelectedFilters] = useState<BeerFilterSelections>(
     createEmptyBeerFilterSelections,
   )

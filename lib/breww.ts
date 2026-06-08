@@ -1,3 +1,5 @@
+import { mkdir, readFile, writeFile } from "node:fs/promises"
+import path from "node:path"
 import { hydrateBeerFinderLocations } from "./beerFinderCoordinates.ts"
 
 type BrewwPaginatedResponse<T> = {
@@ -80,9 +82,9 @@ export type BeerFinderData =
 
 const BREWW_API_BASE_URL = "https://breww.com/api"
 const BREWW_REVALIDATE_SECONDS = 60 * 60
-const DEFAULT_LOOKBACK_DAYS = 30
+const DEFAULT_LOOKBACK_DAYS = 60
 const DEFAULT_PAGE_SIZE = 100
-const MAX_ORDER_PAGES = 8
+const BEER_FINDER_CACHE_FILE_PATH = path.join(process.cwd(), "data", "beer-finder-data-cache.json")
 
 const EXCLUDED_CUSTOMER_TYPES = new Set(["Employee", "Individual", "Integration", "Internal Transfer"])
 const EXCLUDED_CUSTOMER_NAME_PATTERNS = [/^internal\b/i, /^square\b/i]
@@ -125,6 +127,30 @@ function resolveBestAddress(deliveryAddress: BrewwAddress, billingAddress: Breww
 
 function getOrderDate(order: BrewwOrder) {
   return order.fulfillment?.date_scheduled ?? order.issue_date
+}
+
+type BeerFinderCacheFile = Extract<BeerFinderData, { status: "ready" }>
+
+async function readJsonFile<T>(filePath: string, fallback: T) {
+  try {
+    const raw = await readFile(filePath, "utf8")
+    return JSON.parse(raw) as T
+  } catch {
+    return fallback
+  }
+}
+
+async function readBeerFinderCache() {
+  return readJsonFile<BeerFinderCacheFile | null>(BEER_FINDER_CACHE_FILE_PATH, null)
+}
+
+async function persistBeerFinderCache(data: BeerFinderCacheFile) {
+  try {
+    await mkdir(path.dirname(BEER_FINDER_CACHE_FILE_PATH), { recursive: true })
+    await writeFile(BEER_FINDER_CACHE_FILE_PATH, `${JSON.stringify(data, null, 2)}\n`, "utf8")
+  } catch {
+    // Ignore cache write failures and fall back to live fetching on the next request.
+  }
 }
 
 function isExternalCustomer(customerName: string, customerType: string | null) {
@@ -199,7 +225,7 @@ async function fetchRecentOrders(lookbackDays: number) {
 
   const orders: BrewwOrder[] = []
 
-  for (let page = 1; page <= MAX_ORDER_PAGES; page += 1) {
+  for (let page = 1; ; page += 1) {
     const response = await fetchBreww<BrewwPaginatedResponse<BrewwOrder>>(
       `/orders/?page=${page}&page_size=${DEFAULT_PAGE_SIZE}`
     )
@@ -220,7 +246,17 @@ async function fetchRecentOrders(lookbackDays: number) {
   return orders.filter((order) => new Date(getOrderDate(order)) >= cutoffDate)
 }
 
-export async function getBeerFinderData(options: { maxCoordinateLookups?: number } = {}): Promise<BeerFinderData> {
+export async function getBeerFinderData(
+  options: { maxCoordinateLookups?: number; bypassCache?: boolean } = {}
+): Promise<BeerFinderData> {
+  if (!options.bypassCache) {
+    const cachedData = await readBeerFinderCache()
+
+    if (cachedData) {
+      return cachedData
+    }
+  }
+
   if (!process.env.BREWW_API_KEY) {
     return {
       status: "missing-config",
@@ -307,13 +343,17 @@ export async function getBeerFinderData(options: { maxCoordinateLookups?: number
       maxNewLookups: options.maxCoordinateLookups,
     })
 
-    return {
+    const data = {
       status: "ready",
       locations,
       beerNames: Array.from(new Set(locations.flatMap((location) => location.beers))).sort(),
       generatedAt: new Date().toISOString(),
       lookbackDays: DEFAULT_LOOKBACK_DAYS,
-    }
+    } satisfies BeerFinderCacheFile
+
+    await persistBeerFinderCache(data)
+
+    return data
   } catch {
     return {
       status: "ready",

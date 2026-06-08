@@ -4,7 +4,7 @@ import { createPortal } from "react-dom"
 import { flushSync } from "react-dom"
 import { useEffect, useRef, useState } from "react"
 import clsx from "clsx"
-import { upcomingEvents } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { useSwipeToCloseDrawer } from "@/components/layout/useSwipeToCloseDrawer"
 import MobileDrawerHeader from "@/components/layout/MobileDrawerHeader"
 import { DesktopCalendarGridCard } from "@/components/events/desktop/DesktopEventWidgets"
@@ -26,11 +26,13 @@ function ArrowIcon() {
 type DesktopAllUpcomingEventsDrawerProps = {
   className?: string
   triggerLabel?: string
+  events: EventItem[]
 }
 
 export default function DesktopAllUpcomingEventsDrawer({
   className,
   triggerLabel = "View all events",
+  events,
 }: DesktopAllUpcomingEventsDrawerProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isDrawerRendered, setIsDrawerRendered] = useState(false)
@@ -243,7 +245,7 @@ export default function DesktopAllUpcomingEventsDrawer({
 
                 <div className="px-5 pb-7 pt-5">
                   <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    {upcomingEvents.map((event, index) => (
+                    {events.map((event, index) => (
                       <DesktopCalendarGridCard
                         key={event.id}
                         event={event}

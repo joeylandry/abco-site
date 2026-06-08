@@ -1,35 +1,41 @@
-import {defineField, defineType} from 'sanity'
+import {createElement} from 'react'
+import {defineField, defineType, type ArrayOfPrimitivesInputProps, type ValidationContext} from 'sanity'
 import {
   beerAttributeGroups,
   beerAvailabilityOptions,
   beerPackagingOptions,
   bodyAndFeelOptions,
+  type BeerAttributeGroupKey,
   hopCharacterOptions,
   maltCharacterOptions,
   overallProfileOptions,
   yeastFermentationOptions,
 } from '../shared/beerAttributes'
+import {BeerAttributeChecklistInput} from '../components/beerAttributeChecklistInput'
+
+function createBeerAttributeInput(field: (typeof beerAttributeGroups)[number]) {
+  return function BeerAttributeInput(props: ArrayOfPrimitivesInputProps) {
+    return createElement(BeerAttributeChecklistInput, {
+      ...(props as ArrayOfPrimitivesInputProps<string>),
+      groupKey: field.key as BeerAttributeGroupKey,
+      groupTitle: field.title,
+      defaultOptions: field.options,
+    })
+  }
+}
 
 const beerAttributeFields = beerAttributeGroups.map((field) =>
-  field.key === 'appearanceSelections'
-    ? defineField({
-        name: 'appearanceSelections',
-        title: field.title,
-        type: 'array',
-        of: [{type: 'string'}],
-        description: field.description,
-        options: {
-          list: field.options as Array<{title: string; value: string}>,
-          layout: 'checkbox' as unknown as 'list',
-        },
-        validation: (Rule) => Rule.custom(validateUniqueStrings),
-      })
-    : checkboxField(
-        field.key,
-        field.title,
-        field.options as Array<{title: string; value: string}>,
-        field.description,
-      ),
+  defineField({
+    name: field.key,
+    title: field.title,
+    type: 'array',
+    of: [{type: 'string'}],
+    description: field.description,
+    components: {
+      input: createBeerAttributeInput(field),
+    },
+    validation: (Rule) => Rule.custom(validateUniqueStrings),
+  }),
 )
 
 const legacyBeerAttributeFields = [
@@ -151,9 +157,18 @@ function checkboxField(
   })
 }
 
-const validateBeerImageUploads = (value: unknown) => {
-  if (!Array.isArray(value)) {
-    return true
+const validateBeerImageUploads = (value: unknown, context: ValidationContext) => {
+  const document = context.document as
+    | {
+        primaryImage?: unknown
+        cardImage?: unknown
+        image?: unknown
+      }
+    | undefined
+  const hasLegacyImage = Boolean(document?.primaryImage || document?.cardImage || document?.image)
+
+  if (!Array.isArray(value) || value.length === 0) {
+    return hasLegacyImage ? true : 'Add a main desktop image before publishing.'
   }
 
   const counts = value.reduce(
@@ -174,6 +189,10 @@ const validateBeerImageUploads = (value: unknown) => {
     },
     {mainDesktop: 0, desktopHoverMobile: 0},
   )
+
+  if (counts.mainDesktop === 0) {
+    return hasLegacyImage ? true : 'Add a main desktop image before publishing.'
+  }
 
   if (counts.mainDesktop > 1) {
     return 'Only one image can be marked as the main desktop image.'

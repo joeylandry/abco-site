@@ -1,9 +1,11 @@
-import { upcomingEvents } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 import { MobileEventWidget } from "@/components/events/mobile/MobileEventWidgets"
 
-const nextEvent = upcomingEvents[0]
+type HomeMobileNextEventProps = {
+  nextEvent: EventItem | null
+}
 
-export default function HomeMobileNextEvent() {
+export default function HomeMobileNextEvent({ nextEvent }: HomeMobileNextEventProps) {
   if (!nextEvent) {
     return null
   }

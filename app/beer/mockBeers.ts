@@ -117,10 +117,10 @@ function buildBeerMedia(beerId: string, primarySrc: string, alt: string) {
     cardColor: beerCardColors[beerId] ?? "#FFFFFF",
     image: {
       primarySrc,
-      secondarySrc: hoverSrc ?? "/beer/beer2_temp.png",
+      secondarySrc: hoverSrc ?? undefined,
       alt,
     },
-    detailImages: hoverSrc && extraSrc ? [primarySrc, hoverSrc, extraSrc] : [primarySrc, "/beer/beer2_temp.png", primarySrc],
+    detailImages: hoverSrc && extraSrc ? [primarySrc, hoverSrc, extraSrc] : [primarySrc],
   }
 }
 

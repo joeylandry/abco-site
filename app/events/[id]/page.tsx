@@ -10,13 +10,9 @@ import {
 import AllUpcomingEventsDrawer from "@/components/events/mobile/AllUpcomingEventsDrawer"
 import DesktopUpcomingEventsSection from "@/components/events/DesktopUpcomingEventsSection"
 import MobileEventLocationLink from "@/components/events/mobile/MobileEventLocationLink"
-import {
-  getEventById,
-  getRelatedUpcomingEvents,
-  mockEvents,
-} from "@/app/events/mockEvents"
 import { buildEventCalendarFilename } from "@/lib/eventCalendar"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
+import { getEventBySlug, getEventsSnapshot, getRelatedUpcomingEvents } from "@/lib/events"
 import { truncateToEvenLength } from "@/lib/truncateToEvenLength"
 
 const BUY_TICKETS_DESKTOP_BUTTON_CLASS =
@@ -80,17 +76,13 @@ type EventDetailPageProps = {
   }>
 }
 
-export async function generateStaticParams() {
-  return mockEvents.map((event) => ({
-    id: event.id,
-  }))
-}
+export const dynamic = "force-dynamic"
 
 export async function generateMetadata({
   params,
 }: EventDetailPageProps): Promise<Metadata> {
   const { id } = await params
-  const event = getEventById(id)
+  const event = await getEventBySlug(id)
 
   if (!event) {
     return {
@@ -119,7 +111,7 @@ function BackArrowIcon({ className }: { className?: string }) {
 
 export default async function EventDetailPage({ params }: EventDetailPageProps) {
   const { id } = await params
-  const event = getEventById(id)
+  const event = await getEventBySlug(id)
   const fallbackEventImage = "/event_temp_bg.png"
 
   if (!event) {
@@ -138,10 +130,8 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
   const mobileFlyerImage = detailImages.find((imageSrc) => imageSrc !== fallbackEventImage) ?? null
   const calendarHref =
     event.calendarStart && event.calendarEnd ? `/events/${event.id}/calendar` : null
-  const mobileAccentIndex = Math.max(
-    mockEvents.findIndex((candidate) => candidate.id === event.id),
-    0
-  )
+  const { allEvents, upcomingEvents } = await getEventsSnapshot()
+  const mobileAccentIndex = Math.max(allEvents.findIndex((candidate) => candidate.id === event.id), 0)
   const mobileTheme = getEventCardTheme(mobileAccentIndex)
   const mobileDetailBackgroundColor = mixHex(mobileTheme.accentColor, "#FFFFFF", 0.82)
   const mobileDetailTextColor = getRelativeLuminance(mobileDetailBackgroundColor) < 0.45 ? "#FFFFFF" : "#161616"
@@ -155,7 +145,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     `linear-gradient(180deg, ${hexToRgba(mobileTheme.accentColor, 0.08)} 0%, transparent 42%)`,
   ].join(", ")
 
-  const relatedUpcomingEvents = truncateToEvenLength(getRelatedUpcomingEvents(event.id, 8))
+  const relatedUpcomingEvents = truncateToEvenLength(await getRelatedUpcomingEvents(event.id, 8))
 
   return (
     <div className="bg-background">
@@ -245,7 +235,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
                   </Button>
                 ) : null}
               </div>
-              <AllUpcomingEventsDrawer />
+              <AllUpcomingEventsDrawer events={upcomingEvents} />
             </div>
 
             {mobileFlyerImage ? (

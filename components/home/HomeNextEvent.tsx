@@ -7,12 +7,14 @@ import Button from "@/components/ui/Button"
 import EventTag from "@/components/events/EventTag"
 import { DESKTOP_EVENT_SECTION_HEADING_CLASS } from "@/components/events/eventHeadingStyles"
 import { getEventCardTheme } from "@/lib/eventCardTheme"
-import { upcomingEvents } from "@/app/events/mockEvents"
+import type { EventItem } from "@/lib/eventTypes"
 
 const CLEAR_EVENT_BUTTON_CLASS =
   "border border-black bg-transparent text-black shadow-none hover:bg-black/5 hover:text-black"
 
-const nextEvent = upcomingEvents[0]
+type HomeNextEventProps = {
+  nextEvent: EventItem | null
+}
 
 function ForwardArrowIcon({ className }: { className?: string }) {
   return (
@@ -27,7 +29,7 @@ function ForwardArrowIcon({ className }: { className?: string }) {
   )
 }
 
-export default function HomeNextEvent() {
+export default function HomeNextEvent({ nextEvent }: HomeNextEventProps) {
   const router = useRouter()
   const nextEventTheme = nextEvent ? getEventCardTheme(0) : null
 
